@@ -1,0 +1,90 @@
+<!-- Fragmento: Historial de Ventas (Alexander Smith) -->
+<div class="sales-history-view">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Registro Histórico de Ventas</h3>
+            <div class="header-actions">
+                <button id="btn-export-excel" class="btn btn-secondary">📊 Exportar a Excel</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>ID TRX</th>
+                        <th>Fecha y Hora</th>
+                        <th>Productos</th>
+                        <th>Subtotal</th>
+                        <th>IGV (18%)</th>
+                        <th>Total</th>
+                        <th>Método Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- Cargado dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Ticket / Recibo (Reutilizado) -->
+    <div id="ticket-modal" class="modal">
+        <div class="modal-content" style="max-width: 380px; font-family: 'Courier New', Courier, monospace; color: #000; padding: 40px 30px;">
+            <div class="ticket-header" style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 15px; margin-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 24px;">GAMELAB 🎮</h2>
+                <p style="font-size: 12px; margin: 5px 0;">RUC: 20601234567</p>
+                <p style="font-size: 12px; margin: 5px 0;">Sede Central - Lima</p>
+                <p style="font-size: 14px; font-weight: bold; margin-top: 10px;" id="ticket-id">TRX-0000</p>
+                <p style="font-size: 12px;" id="ticket-date">07/06/2026 14:30</p>
+            </div>
+            <div class="ticket-body">
+                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #000;">
+                            <th style="text-align: left; padding: 5px 0;">Cant.</th>
+                            <th style="text-align: left; padding: 5px 0;">Producto</th>
+                            <th style="text-align: right; padding: 5px 0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticket-items">
+                        <!-- Items dinámicos -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="ticket-footer" style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
+                    <span>Subtotal:</span>
+                    <span id="ticket-subtotal">S/ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
+                    <span>IGV (18%):</span>
+                    <span id="ticket-igv">S/ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 10px;">
+                    <span>TOTAL:</span>
+                    <span id="ticket-total">S/ 0.00</span>
+                </div>
+                <div style="text-align: center; margin-top: 25px;">
+                    <p style="margin: 0; font-size: 13px; font-weight: bold;" id="ticket-payment-method">PAGO: EFECTIVO</p>
+                    <p style="margin: 15px 0 0 0; font-size: 11px;">¡Gracias por tu preferencia!</p>
+                    <p style="margin: 5px 0 0 0; font-size: 11px;">Vuelve pronto a GameLab</p>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" style="margin-top: 30px; font-family: 'Inter', sans-serif;" onclick="document.getElementById('ticket-modal').style.display='none'">Cerrar Recibo</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.sales-history-view td {
+    vertical-align: middle;
+}
+.prod-list-mini {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 0;
+    padding-left: 15px;
+}
+</style>
