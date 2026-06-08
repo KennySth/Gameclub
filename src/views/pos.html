@@ -1,15 +1,352 @@
-<!-- Fragmento: Ventas POS (Katherine Patricia) -->
-<div id="pos-container">
-    <h2>Punto de Venta (POS)</h2>
-    <div class="pos-grid">
-        <div class="product-search">
-            <!-- Buscador de productos -->
+<!-- Fragmento: Punto de Venta (Katherine Patricia) -->
+<div class="pos-view">
+    <div class="pos-container">
+        <!-- Izquierda: Catálogo y Búsqueda -->
+        <div class="pos-catalog">
+            <div class="card catalog-card">
+                <div class="card-header">
+                    <div class="search-box catalog-search">
+                        <input type="text" id="pos-search" placeholder="Buscar producto por nombre o código...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+
+                <!-- Filtro de Categorías -->
+                <div class="category-bar" id="pos-category-bar">
+                    <button class="cat-btn active" data-category="all">Todos</button>
+                    <button class="cat-btn" data-category="Consolas">Consolas</button>
+                    <button class="cat-btn" data-category="Videojuegos">Videojuegos</button>
+                    <button class="cat-btn" data-category="Accesorios">Accesorios</button>
+                </div>
+
+                <div class="catalog-grid" id="pos-catalog-grid">
+                    <!-- Productos cargados dinámicamente -->
+                </div>
+            </div>
         </div>
-        <div class="cart-section">
-            <!-- Carrito, cálculo de IGV y total -->
+
+        <!-- Derecha: Carrito de Compras -->
+        <div class="pos-cart">
+            <div class="card cart-card">
+                <div class="card-header">
+                    <h3 class="card-title">Carrito de Compras</h3>
+                    <button class="btn btn-action" id="btn-clear-cart">🗑️ Limpiar</button>
+                </div>
+                
+                <div class="cart-items-container">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-body">
+                            <!-- Items del carrito -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>IGV (18%)</span>
+                        <span id="cart-igv">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="cart-total">S/ 0.00</span>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <label>Método de Pago</label>
+                        <select id="payment-method">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Yape/POS">Yape / POS</option>
+                            <option value="QR">Código QR</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" id="btn-checkout">
+                        Procesar Pago
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="payment-methods">
-            <!-- Métodos de pago -->
+    </div>
+
+    <!-- Modal de Confirmación de Pago (Pin de 4 dígitos) -->
+    <div id="payment-confirm-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 style="margin-bottom: 20px;">Confirmar Pago Electrónico</h3>
+            
+            <div class="confirm-info-box" style="background: var(--primary-bg); padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--text-muted); font-size: 14px;">Método:</span>
+                    <span id="confirm-method" style="font-weight: 700; color: var(--accent-color);">Yape</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--text-muted); font-size: 14px;">Monto a Cobrar:</span>
+                    <span id="confirm-amount" style="font-weight: 700; color: var(--text-main);">S/ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px dashed #ccc;">
+                    <span style="color: var(--text-muted); font-size: 14px;">Código de Operación:</span>
+                    <span id="confirm-generated-code" style="font-weight: 800; color: var(--info); font-size: 18px; letter-spacing: 2px;">4831</span>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                Ingrese el código de arriba para confirmar la venta
+            </p>
+            
+            <div class="pin-container">
+                <input type="text" id="payment-pin" maxlength="4" placeholder="0000" inputmode="numeric" 
+                       style="font-size: 32px; text-align: center; width: 100%; letter-spacing: 10px; padding: 15px; border-radius: 12px; border: 2px solid var(--accent-color); background: #fff;">
+            </div>
+            
+            <div class="form-actions" style="margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button type="button" class="btn btn-secondary" id="btn-cancel-payment">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-pin">Confirmar Pago</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ticket / Recibo -->
+    <div id="ticket-modal" class="modal">
+        <div class="modal-content" style="max-width: 380px; font-family: 'Courier New', Courier, monospace; color: #000; padding: 40px 30px;">
+            <div class="ticket-header" style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 15px; margin-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 24px;">GAMELAB 🎮</h2>
+                <p style="font-size: 12px; margin: 5px 0;">RUC: 20601234567</p>
+                <p style="font-size: 12px; margin: 5px 0;">Sede Central - Lima</p>
+                <p style="font-size: 14px; font-weight: bold; margin-top: 10px;" id="ticket-id">TRX-0000</p>
+                <p style="font-size: 12px;" id="ticket-date">07/06/2026 14:30</p>
+            </div>
+            <div class="ticket-body">
+                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #000;">
+                            <th style="text-align: left; padding: 5px 0;">Cant.</th>
+                            <th style="text-align: left; padding: 5px 0;">Producto</th>
+                            <th style="text-align: right; padding: 5px 0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticket-items">
+                        <!-- Items dinámicos -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="ticket-footer" style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
+                    <span>Subtotal:</span>
+                    <span id="ticket-subtotal">S/ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
+                    <span>IGV (18%):</span>
+                    <span id="ticket-igv">S/ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 10px;">
+                    <span>TOTAL:</span>
+                    <span id="ticket-total">S/ 0.00</span>
+                </div>
+                <div style="text-align: center; margin-top: 25px;">
+                    <p style="margin: 0; font-size: 13px; font-weight: bold;" id="ticket-payment-method">PAGO: EFECTIVO</p>
+                    <p style="margin: 15px 0 0 0; font-size: 11px;">¡Gracias por tu preferencia!</p>
+                    <p style="margin: 5px 0 0 0; font-size: 11px;">Vuelve pronto a GameLab</p>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" style="margin-top: 30px; font-family: 'Inter', sans-serif;" onclick="document.getElementById('ticket-modal').style.display='none'">Cerrar Recibo</button>
         </div>
     </div>
 </div>
+
+<style>
+.pos-container {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 20px;
+    height: calc(100vh - 140px);
+}
+
+.pos-catalog, .pos-cart {
+    height: 100%;
+}
+
+.catalog-card, .cart-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-bar {
+    display: flex;
+    gap: 10px;
+    padding: 0 25px 20px 25px;
+    flex-wrap: wrap;
+}
+
+.cat-btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    background-color: var(--primary-bg);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cat-btn:hover {
+    background-color: var(--sidebar-hover);
+    color: var(--text-white);
+}
+
+.cat-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    box-shadow: 0px 4px 10px rgba(233, 69, 96, 0.2);
+}
+
+.catalog-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    padding: 10px 20px;
+    overflow-y: auto;
+}
+
+.product-item {
+    background-color: var(--primary-bg);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow);
+    border-color: var(--accent-color);
+    background-color: white;
+}
+
+.product-item .prod-icon {
+    font-size: 44px;
+    margin-bottom: 12px;
+}
+
+.product-item .prod-name {
+    font-weight: 700;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+.product-item .prod-price {
+    color: var(--accent-color);
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.product-item .prod-stock {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: block;
+    font-weight: 500;
+}
+
+.cart-items-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 5px;
+}
+
+.cart-table td {
+    padding: 12px 5px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.cart-summary {
+    padding-top: 20px;
+    border-top: 2px dashed #eee;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.summary-row.total {
+    margin-top: 15px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.payment-method {
+    margin: 20px 0;
+}
+
+.payment-method label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.payment-method select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    background-color: var(--primary-bg);
+    outline: none;
+}
+
+.btn-block {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    border-radius: 15px;
+}
+
+@media (max-width: 1100px) {
+    .pos-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
