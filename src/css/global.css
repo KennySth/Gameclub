@@ -291,3 +291,17 @@ body {
     background-color: rgba(238, 93, 80, 0.15) !important;
 }
 
+/* ============================================
+   SIDEBAR & MAIN - Fixed Layout
+   ============================================ */
+.sidebar-fixed {
+    width: 245px;
+    position: fixed;
+    height: 100vh;
+    z-index: 1050;
+}
+
+.main-content {
+    margin-left: 245px;
+}
+
