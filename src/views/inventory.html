@@ -1,13 +1,204 @@
 <!-- Fragmento: Inventario / Stock (Kenny Sthiven) -->
-<div id="inventory-container">
-    <h2>Gestión de Inventario</h2>
-    <div class="inventory-actions">
-        <!-- Botón Agregar, Filtros de búsqueda -->
+<div class="inventory-view">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Gestión de Inventario</h3>
+            <div class="header-actions" style="display: flex; gap: 10px;">
+                <button id="btn-scan-barcode-inv" class="btn btn-secondary">
+                    📷 Escanear Barra
+                </button>
+                <button id="btn-add-product" class="btn btn-primary">
+                    <span>+</span> Nuevo Producto
+                </button>
+            </div>
+        </div>
+        
+        <div class="inventory-filters">
+            <div class="search-bar">
+                <input type="text" id="inventory-search" placeholder="Buscar por nombre o ID...">
+            </div>
+            <div class="filter-group">
+                <select id="filter-category">
+                    <option value="all">Todas las Categorías</option>
+                    <option value="Consolas">Consolas</option>
+                    <option value="Videojuegos">Videojuegos</option>
+                    <option value="Accesorios">Accesorios</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body">
+                    <!-- Filas cargadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="table-responsive">
-        <table id="inventory-table">
-            <!-- Tabla: ID, Nombre, Stock, Precio, Acciones -->
-        </table>
-    </div>
+
     <!-- Modal para Agregar/Editar -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Agregar Producto</h3>
+            <form id="product-form">
+                <input type="hidden" id="prod-id-original">
+                <div class="form-group">
+                    <label>ID Producto</label>
+                    <input type="text" id="prod-id" required placeholder="PROD-000">
+                </div>
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="prod-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="prod-category">
+                        <option value="Consolas">Consolas</option>
+                        <option value="Videojuegos">Videojuegos</option>
+                        <option value="Accesorios">Accesorios</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Precio</label>
+                    <input type="number" id="prod-price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock Inicial</label>
+                    <input type="number" id="prod-stock" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock Mínimo</label>
+                    <input type="number" id="prod-min" value="5">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-close-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Simulación de Escaneo Real -->
+    <div id="scanner-visual-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px; background: #000; color: #fff; text-align: center; border: 2px solid var(--accent-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: var(--accent-color); letter-spacing: 2px;">LECTOR LÁSER ACTIVO</h3>
+                <button class="btn-action" id="btn-close-scanner" style="color: #fff;">✕</button>
+            </div>
+            
+            <div class="scanner-container">
+                <div class="scanner-viewfinder">
+                    <div class="scanner-laser"></div>
+                    <div class="scanner-corners"></div>
+                    <div class="barcode-placeholder">
+                        || ||| | |||| | || |||| |
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <p id="scanner-status" style="font-family: 'Courier New', Courier, monospace; font-size: 14px; color: #0f0;">
+                    BUSCANDO CÓDIGO DE BARRAS...
+                </p>
+                <div class="progress-bar-container" style="width: 100%; height: 4px; background: #222; margin-top: 10px; border-radius: 2px; overflow: hidden;">
+                    <div id="scanner-progress" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 2s linear;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.scanner-container {
+    position: relative;
+    height: 200px;
+    background: #111;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.scanner-viewfinder {
+    position: relative;
+    width: 80%;
+    height: 120px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scanner-laser {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-color);
+    z-index: 10;
+    animation: scanning 2s infinite ease-in-out;
+}
+
+.barcode-placeholder {
+    font-size: 60px;
+    letter-spacing: -2px;
+    opacity: 0.3;
+    font-family: 'serif';
+    color: #fff;
+}
+
+.scanner-corners {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+}
+.scanner-corners::before, .scanner-corners::after {
+    content: ''; position: absolute; width: 20px; height: 20px; border-color: var(--accent-color); border-style: solid;
+}
+.scanner-corners::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+.scanner-corners::after { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+
+@keyframes scanning {
+    0% { top: 0; }
+    50% { top: 100%; }
+    100% { top: 0; }
+}
+
+.inventory-filters {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+.search-bar { flex: 1; }
+.search-bar input, .filter-group select {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    outline: none;
+    font-size: 14px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+</style>
