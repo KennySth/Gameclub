@@ -62,19 +62,7 @@ Historial de transacciones realizadas en el POS.
 ]
 ```
 
-## 4. Configuración (`gamelab_config`)
-Preferencias globales del sistema.
-
-```json
-{
-  "sede": "Sede Central - Lima",
-  "moneda": "S/",
-  "igv_porcentaje": 0.18,
-  "stock_minimo_defecto": 5
-}
-```
-
-## 5. Alertas de Stock (`gamelab_alertas`)
+## 4. Alertas de Stock (`gamelab_alertas`)
 Registro temporal de productos que requieren reposición inmediata.
 
 ```json
