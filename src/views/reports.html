@@ -1,13 +1,43 @@
-<!-- Fragmento: Reportes (Alexander Smith) -->
-<div id="reports-container">
-    <h2>Reportes y Métricas</h2>
-    <div class="stats-summary">
-        <!-- Gráficos de ventas y métricas clave -->
+<div class="reports-view">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--accent-color);">📈</div>
+            <div class="stat-info">
+                <span class="label">Crecimiento Mensual</span>
+                <span class="value">+24%</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--info);">💎</div>
+            <div class="stat-info">
+                <span class="label">Producto Estrella</span>
+                <span class="value" id="top-product-name">-</span>
+            </div>
+        </div>
     </div>
-    <div class="top-products">
-        <!-- Lista de Top 5 productos -->
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Rendimiento de Ventas (Últimos 7 días)</h3>
+            <button class="btn btn-secondary" onclick="alert('Generando PDF...')">📥 Descargar PDF</button>
+        </div>
+        <div class="chart-placeholder" style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border-radius: 15px; border: 2px dashed #ddd;">
+            <p style="color: var(--text-muted);">[ Espacio para Gráfico de Barras / Chart.js ]</p>
+        </div>
     </div>
-    <div class="export-options">
-        <!-- Botones para exportar datos -->
+
+    <div class="reports-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Top 5 Categorías</h3></div>
+            <div id="top-categories-list">
+                <!-- Dinámico -->
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Métodos de Pago más usados</h3></div>
+            <div id="payment-stats">
+                <!-- Dinámico -->
+            </div>
+        </div>
     </div>
 </div>
