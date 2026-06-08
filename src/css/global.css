@@ -1,16 +1,53 @@
 /* global.css - Colores, tipografía y utilidades */
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #34495e;
-    --accent-color: #3498db;
-    --text-color: #333;
-    --bg-color: #f4f4f4;
+    /* Colores Principales */
+    --primary-bg: #f4f7fe;
+    --sidebar-bg: #1a1a2e;
+    --sidebar-hover: #16213e;
+    --accent-color: #e94560;
+    --accent-hover: #cf3d55;
+    
+    /* Colores de Texto */
+    --text-main: #2b3674;
+    --text-muted: #a3aed0;
+    --text-white: #ffffff;
+    
+    /* Colores de Estado */
+    --success: #05cd99;
+    --warning: #ffb547;
+    --danger: #ee5d50;
+    --info: #4318ff;
+
+    /* Sombras y Bordes */
+    --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+    --border-radius: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }

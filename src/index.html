@@ -3,18 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gameclub - Sistema de Gestión</title>
+    <title>GameLab - Sistema de Gestión</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-    <main id="app">
-        <!-- El contenido se cargará dinámicamente aquí -->
-        <h1>Cargando aplicación...</h1>
-    </main>
+    <!-- Contenedor Principal (Login o App) -->
+    <div id="main-container">
+        <!-- El wrapper se ocultará si no hay sesión -->
+        <div class="wrapper" id="app-wrapper" style="display: none;">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <span class="logo-icon">🎮</span>
+                        <span class="logo-text">GameLab</span>
+                    </div>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul id="sidebar-menu">
+                        <li data-view="dashboard" data-role="admin">
+                            <span class="icon">🏠</span> <span>Inicio</span>
+                        </li>
+                        <li data-view="pos" data-role="cajero">
+                            <span class="icon">🛒</span> <span>Ventas</span>
+                        </li>
+                        <li data-view="inventory" data-role="admin">
+                            <span class="icon">📦</span> <span>Inventario</span>
+                        </li>
+                        <li data-view="sales-history" data-role="all">
+                            <span class="icon">📜</span> <span>Historial</span>
+                        </li>
+                        <li data-view="reports" data-role="admin">
+                            <span class="icon">📊</span> <span>Reportes</span>
+                        </li>
+                        <li data-view="users" data-role="admin">
+                            <span class="icon">👥</span> <span>Usuarios</span>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer">
+                    <button id="btn-logout" class="logout-link">
+                        <span class="icon">🚪</span> <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="main-panel">
+                <!-- Header -->
+                <header class="main-header">
+                    <div class="header-left">
+                        <h2 id="view-title">Panel de Control</h2>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-profile">
+                            <span class="user-name" id="display-user-name">Usuario</span>
+                            <img src="assets/user-avatar.png" alt="Avatar" class="avatar" id="display-user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=e94560&color=fff'">
+                        </div>
+                    </div>
+                </header>
+
+                <!-- dynamic Content -->
+                <main id="app" class="content">
+                    <!-- El contenido dinámico se carga aquí -->
+                </main>
+            </div>
+        </div>
+
+        <!-- Contenedor para la vista de Login (se inyecta aquí) -->
+        <div id="login-container"></div>
+    </div>
 
     <script src="js/core/storage.js"></script>
+    <script src="js/auth/login.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/inventory.js"></script>
+    <script src="js/modules/pos.js"></script>
+    <script src="js/modules/sales-history.js"></script>
+    <script src="js/modules/reports.js"></script>
+    <script src="js/modules/users.js"></script>
     <script src="js/app.js" type="module"></script>
 </body>
 </html>
