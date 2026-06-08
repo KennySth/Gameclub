@@ -1,13 +1,87 @@
-<!-- Fragmento: Reportes (Alexander Smith) -->
-<div id="reports-container">
-    <h2>Reportes y Métricas</h2>
-    <div class="stats-summary">
-        <!-- Gráficos de ventas y métricas clave -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameLab - Reportes</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/reports.css"> 
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h2 style="padding: 20px; margin: 0; border-bottom: 1px solid var(--border-color);">🎮 GameLab POS</h2>
+            <ul style="list-style: none; padding: 20px; line-height: 2.5;">
+                <li><a href="#" style="color: #9ca3af; text-decoration: none;">🏠 Dashboard</a></li>
+                <li><a href="#" style="color: #9ca3af; text-decoration: none;">🛒 Punto de Venta</a></li>
+                <li><a href="#" style="color: #9ca3af; text-decoration: none;">📦 Inventario</a></li>
+                <li><a href="#" style="color: white; background-color: #8b5cf6; padding: 8px 15px; border-radius: 8px; font-weight: bold; text-decoration: none; display: block;">📊 Reportes</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="reports-container">
+                <header class="module-header">
+                    <h2>Reportes y Estadísticas</h2>
+                </header>
+
+                <div class="filters-bar">
+                    <div class="filters-group">
+                        <span>Periodo:</span>
+                        <input type="date" id="dateStart" class="input-dark" value="2026-01-05">
+                        <span>al</span>
+                        <input type="date" id="dateEnd" class="input-dark" value="2026-09-05">
+                        <span style="margin-left: 20px;">Mostrar:</span>
+                        <select id="filterCategory" class="input-dark">
+                            <option value="todas">Ventas Generales</option>
+                            <option value="hardware">Hardware / Consolas</option>
+                            <option value="snacks">Snacks y Bebidas</option>
+                        </select>
+                    </div>
+                    <button class="btn-export" id="btnExportExcel">📄 Exportar a CSV    </button>
+                </div>
+
+                <section class="kpis-grid">
+                    <div class="kpi-card"><span class="kpi-label">Ingresos Totales</span><strong class="kpi-value" id="kpiRevenue">S/ 0.00</strong></div>
+                    <div class="kpi-card"><span class="kpi-label">Productos Vendidos</span><strong class="kpi-value" id="kpiProducts">0</strong></div>
+                    <div class="kpi-card"><span class="kpi-label">Ticket Promedio</span><strong class="kpi-value" id="kpiTicket">S/ 0.00</strong></div>
+                    <div class="kpi-card"><span class="kpi-label">Devoluciones</span><strong class="kpi-value" id="kpiReturns">0</strong></div>
+                </section>
+
+                <section class="data-grid">
+                    <div class="card chart-container">
+                        <h3>Tendencia de Ventas (Últimos 7 días)</h3>
+                        <div class="chart-wrapper"><canvas id="ventasChart"></canvas></div>
+                    </div>
+                    <div class="top-table">
+                        <h3>Top 5 Más Vendidos</h3>
+                        <table class="table-dark">
+                            <thead><tr><th>#</th><th>Producto</th><th>Cant.</th><th>Total (S/)</th></tr></thead>
+                            <tbody id="topProductsList"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
-    <div class="top-products">
-        <!-- Lista de Top 5 productos -->
-    </div>
-    <div class="export-options">
-        <!-- Botones para exportar datos -->
-    </div>
-</div>
+
+    <script src="../js/core/storage.js"></script>
+    <script src="../js/modules/reports.js"></script>
+
+    <script>
+        window.onload = () => {
+            if (window.ReportsModule) {
+                window.ReportsModule.init();
+            } else {
+                console.error("Error: Storage o ReportsModule no están definidos.");
+            }
+        };
+    </script>
+</body>
+</html>
