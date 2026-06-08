@@ -1,53 +1,293 @@
-/* global.css - Colores, tipografía y utilidades */
+/* global.css - Tema Gaming consolidado para Bootstrap 5 */
+
+/* ============================================
+   VARIABLES CSS - Paleta Gaming
+   ============================================ */
 :root {
-    /* Colores Principales */
-    --primary-bg: #f4f7fe;
-    --sidebar-bg: #1a1a2e;
-    --sidebar-hover: #16213e;
-    --accent-color: #e94560;
-    --accent-hover: #cf3d55;
+    /* Bootstrap Overrides */
+    --bs-primary: #7b2cbf;
+    --bs-primary-rgb: 123, 44, 191;
+    --bs-body-bg: #f8f7fa;
+    --bs-body-font-family: 'Inter', 'Segoe UI', sans-serif;
     
-    /* Colores de Texto */
-    --text-main: #2b3674;
-    --text-muted: #a3aed0;
-    --text-white: #ffffff;
+    /* Gaming Theme Colors (Purple Palette) */
+    --game-sidebar-bg: #2d2438;
+    --game-sidebar-hover: #3e324c;
+    --game-accent: #7b2cbf;
+    --game-text-main: #2a2631;
+    --game-text-muted: #9d92a8;
     
-    /* Colores de Estado */
-    --success: #05cd99;
-    --warning: #ffb547;
-    --danger: #ee5d50;
-    --info: #4318ff;
-
-    /* Sombras y Bordes */
-    --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
-    --border-radius: 20px;
+    /* Status Colors */
+    --game-success: #05cd99;
+    --game-warning: #ffb547;
+    --game-danger: #ee5d50;
+    
+    /* UI Helpers */
+    --game-card-shadow: 0px 18px 40px rgba(45, 36, 56, 0.08);
+    --game-border-radius: 1.25rem;
+    --game-dark-gradient: radial-gradient(circle at center, #2d2438 0%, #1a1520 100%);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* ============================================
+   BASE STYLES
+   ============================================ */
 body {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-color: var(--primary-bg);
-    color: var(--text-main);
-    overflow-x: hidden;
+    background-color: var(--bs-body-bg);
+    color: var(--game-text-main);
+    font-family: var(--bs-body-font-family);
+    -webkit-font-smoothing: antialiased;
 }
 
-ul {
-    list-style: none;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-button {
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--game-sidebar-bg);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--game-accent);
+}
+
+/* ============================================
+   LAYOUT - Sidebar + Main Panel (Desktop)
+   ============================================ */
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar - Fixed Left Navigation */
+.sidebar {
+    width: 280px;
+    background-color: var(--game-sidebar-bg);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 2.5rem 1.5rem;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 0 1rem;
+}
+
+.sidebar-nav ul li {
+    padding: 0.8rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     cursor: pointer;
-    border: none;
-    outline: none;
-    font-family: inherit;
+    transition: all 0.2s ease;
+    color: var(--game-text-muted);
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+.sidebar-nav ul li:hover {
+    background-color: var(--game-sidebar-hover);
+    color: white;
 }
+
+.sidebar-nav ul li.active {
+    background-color: var(--game-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logout-link {
+    background: transparent;
+    color: var(--game-text-muted);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.logout-link:hover {
+    color: var(--game-danger);
+    background-color: rgba(238, 93, 80, 0.05);
+}
+
+/* Main Content Area */
+.main-panel {
+    flex: 1;
+    margin-left: 280px;
+    background-color: var(--bs-body-bg);
+}
+
+.main-header {
+    padding: 1.5rem 2.5rem;
+    background-color: transparent;
+}
+
+.header-left h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--game-text-main);
+    margin: 0;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    box-shadow: var(--game-card-shadow);
+}
+
+/* ============================================
+   COMPONENTS - Cards, Buttons, Forms
+   ============================================ */
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--game-border-radius);
+    box-shadow: var(--game-card-shadow);
+    background-color: #ffffff;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--game-accent);
+    border-color: var(--game-accent);
+}
+
+.btn-primary:hover {
+    background-color: #622399;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--bs-primary);
+    opacity: 1;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 0.8em;
+    border-radius: 0.5rem;
+    font-weight: 700;
+}
+
+/* Modals */
+.modal-content {
+    border: none;
+    border-radius: var(--game-border-radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   DASHBOARD COMPONENTS
+   ============================================ */
+
+/* KPI/Stat Cards */
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   LOGIN PAGE - Gaming Dark Theme
+   ============================================ */
+
+.bg-gaming-dark {
+    background: var(--game-dark-gradient);
+}
+
+/* ============================================
+   SIDEBAR REFINEMENTS (Bootstrap Overrides)
+   ============================================ */
+#sidebar-menu .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+    border-radius: 0.75rem;
+}
+
+#sidebar-menu .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar-menu .nav-link.active {
+    background-color: var(--game-accent) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
+}
+
+#sidebar-menu .nav-link i {
+    opacity: 0.8;
+}
+
+#sidebar-menu .nav-link.active i {
+    opacity: 1;
+}
+
+/* Logout Specific */
+.logout-nav-link {
+    color: rgba(255, 255, 255, 0.5) !important;
+    transition: all 0.2s ease;
+    border-radius: 0.75rem;
+}
+
+.logout-nav-link:hover {
+    color: white !important;
+    background-color: rgba(238, 93, 80, 0.15) !important;
+}
+

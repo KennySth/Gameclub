@@ -1,352 +1,250 @@
-<!-- Fragmento: Punto de Venta (Katherine Patricia) -->
-<div class="pos-view">
-    <div class="pos-container">
+<!-- Fragmento: Punto de Venta (Katherine Patricia) - Refactorizado con Bootstrap 5 -->
+<div class="container-fluid p-0">
+    <div class="row g-3">
         <!-- Izquierda: Catálogo y Búsqueda -->
-        <div class="pos-catalog">
-            <div class="card catalog-card">
-                <div class="card-header">
-                    <div class="search-box catalog-search">
-                        <input type="text" id="pos-search" placeholder="Buscar producto por nombre o código...">
-                        <span class="search-icon">🔍</span>
+        <div class="col-lg-8 d-flex flex-column" style="max-height: calc(100vh - 120px);">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="input-group mb-3 shadow-sm rounded-3">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="pos-search" class="form-control border-start-0 ps-0" placeholder="Buscar producto por nombre o código...">
+                    </div>
+
+                    <!-- Filtro de Categorías -->
+                    <div class="d-flex gap-2 mb-2 overflow-x-auto pb-2" id="pos-category-bar">
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn active" data-category="all">Todos</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Consolas">Consolas</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Videojuegos">Videojuegos</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Accesorios">Accesorios</button>
                     </div>
                 </div>
 
-                <!-- Filtro de Categorías -->
-                <div class="category-bar" id="pos-category-bar">
-                    <button class="cat-btn active" data-category="all">Todos</button>
-                    <button class="cat-btn" data-category="Consolas">Consolas</button>
-                    <button class="cat-btn" data-category="Videojuegos">Videojuegos</button>
-                    <button class="cat-btn" data-category="Accesorios">Accesorios</button>
-                </div>
-
-                <div class="catalog-grid" id="pos-catalog-grid">
-                    <!-- Productos cargados dinámicamente -->
+                <div class="card-body overflow-y-auto pt-0 px-4">
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3" id="pos-catalog-grid">
+                        <!-- Productos cargados dinámicamente -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Derecha: Carrito de Compras -->
-        <div class="pos-cart">
-            <div class="card cart-card">
-                <div class="card-header">
-                    <h3 class="card-title">Carrito de Compras</h3>
-                    <button class="btn btn-action" id="btn-clear-cart">🗑️ Limpiar</button>
+        <div class="col-lg-4 d-flex flex-column" style="max-height: calc(100vh - 120px);">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-bold mb-0 text-dark">Carrito de Compras</h5>
+                    <button class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" id="btn-clear-cart" title="Limpiar Carrito">
+                        <i class="bi bi-trash3 fs-5"></i>
+                    </button>
                 </div>
                 
-                <div class="cart-items-container">
-                    <table class="cart-table">
+                <div class="card-body d-flex flex-column px-4">
+                    <div class="flex-grow-1 overflow-y-auto mb-3" style="min-height: 200px;">
+                        <table class="table table-hover align-middle">
+                            <thead class="sticky-top bg-white">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>Producto</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-body">
+                                <!-- Items del carrito -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Resumen del Carrito -->
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2 small text-secondary">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal">S/ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 small text-secondary">
+                            <span>IGV (18%)</span>
+                            <span id="cart-igv">S/ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="h4 fw-bold text-dark">Total</span>
+                            <span class="h4 fw-bold text-primary" id="cart-total">S/ 0.00</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Método de Pago</label>
+                            <select class="form-select border-light-subtle shadow-sm" id="payment-method">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Yape/POS">Yape / POS</option>
+                                <option value="QR">Código QR</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2 mb-2" id="btn-checkout">
+                            Procesar Pago <i class="bi bi-credit-card-2-back fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Confirmar Pago Electrónico -->
+<div class="modal fade" id="payment-confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title w-100 text-center fw-bold">Confirmar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-light p-3 rounded-4 mb-4 text-start border border-dashed border-secondary-subtle">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Método:</span>
+                        <span id="confirm-method" class="fw-bold text-primary small">Yape</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 border-bottom border-dashed pb-2">
+                        <span class="text-muted small">Monto:</span>
+                        <span id="confirm-amount" class="fw-bold text-dark h5 mb-0">S/ 0.00</span>
+                    </div>
+                    <div class="text-center py-2">
+                        <span class="text-muted small d-block mb-1">Código de Operación:</span>
+                        <span id="confirm-generated-code" class="h2 fw-bolder text-info letter-spacing-4">4831</span>
+                    </div>
+                </div>
+
+                <p class="small text-muted mb-3">Ingrese el código mostrado arriba para confirmar</p>
+                
+                <div class="mb-4">
+                    <input type="text" id="payment-pin" class="form-control form-control-lg text-center fw-bold fs-2 rounded-4 border-2" maxlength="4" placeholder="0000" inputmode="numeric" style="letter-spacing: 12px;">
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-light w-100 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary w-100 py-2 fw-semibold" id="btn-confirm-pin">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Ticket / Recibo -->
+<div class="modal fade" id="ticket-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 p-sm-5 text-dark" style="font-family: 'Courier New', Courier, monospace;">
+                <div class="text-center mb-4 border-bottom border-dashed pb-3">
+                    <h3 class="fw-bold mb-0">GAMELAB 🎮</h3>
+                    <p class="small mb-1">RUC: 20601234567</p>
+                    <p class="small mb-2">Sede Central - Lima</p>
+                    <div class="bg-light py-2 rounded-3 mt-2">
+                        <span class="fw-bold small d-block" id="ticket-id">TRX-0000</span>
+                        <span class="small" id="ticket-date">07/06/2026 14:30</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <table class="table table-sm table-borderless small w-100 mb-0">
                         <thead>
-                            <tr>
+                            <tr class="border-bottom border-dark border-opacity-25">
+                                <th class="ps-0">Cant.</th>
                                 <th>Producto</th>
-                                <th>Cant.</th>
-                                <th>Precio</th>
-                                <th>Total</th>
-                                <th></th>
+                                <th class="text-end pe-0">Total</th>
                             </tr>
                         </thead>
-                        <tbody id="cart-body">
-                            <!-- Items del carrito -->
+                        <tbody id="ticket-items">
+                            <!-- Items dinámicos -->
                         </tbody>
                     </table>
                 </div>
 
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="cart-subtotal">S/ 0.00</span>
+                <div class="border-top border-dashed pt-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Subtotal:</span>
+                        <span id="ticket-subtotal">S/ 0.00</span>
                     </div>
-                    <div class="summary-row">
-                        <span>IGV (18%)</span>
-                        <span id="cart-igv">S/ 0.00</span>
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>IGV (18%):</span>
+                        <span id="ticket-igv">S/ 0.00</span>
                     </div>
-                    <div class="summary-row total">
-                        <span>Total</span>
-                        <span id="cart-total">S/ 0.00</span>
+                    <div class="d-flex justify-content-between h5 fw-bold mt-2">
+                        <span>TOTAL:</span>
+                        <span id="ticket-total">S/ 0.00</span>
                     </div>
                     
-                    <div class="payment-method">
-                        <label>Método de Pago</label>
-                        <select id="payment-method">
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="Tarjeta">Tarjeta</option>
-                            <option value="Yape/POS">Yape / POS</option>
-                            <option value="QR">Código QR</option>
-                        </select>
+                    <div class="text-center mt-4">
+                        <p class="fw-bold small mb-3" id="ticket-payment-method">PAGO: EFECTIVO</p>
+                        <p class="small mb-0 opacity-75">¡Gracias por tu preferencia!</p>
+                        <p class="small mb-0 opacity-75">Vuelve pronto a GameLab</p>
                     </div>
-
-                    <button class="btn btn-primary btn-block" id="btn-checkout">
-                        Procesar Pago
-                    </button>
                 </div>
+
+                <button class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-4 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2" data-bs-dismiss="modal">
+                    Cerrar Recibo <i class="bi bi-check-circle fs-5"></i>
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Confirmación de Pago (Pin de 4 dígitos) -->
-    <div id="payment-confirm-modal" class="modal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <h3 style="margin-bottom: 20px;">Confirmar Pago Electrónico</h3>
-            
-            <div class="confirm-info-box" style="background: var(--primary-bg); padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: var(--text-muted); font-size: 14px;">Método:</span>
-                    <span id="confirm-method" style="font-weight: 700; color: var(--accent-color);">Yape</span>
+<!-- Modal: Alerta Genérica -->
+<div class="modal fade" id="alert-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-body p-4 text-center">
+                <div class="text-warning mb-3">
+                    <i class="bi bi-exclamation-triangle-fill display-4"></i>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: var(--text-muted); font-size: 14px;">Monto a Cobrar:</span>
-                    <span id="confirm-amount" style="font-weight: 700; color: var(--text-main);">S/ 0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px dashed #ccc;">
-                    <span style="color: var(--text-muted); font-size: 14px;">Código de Operación:</span>
-                    <span id="confirm-generated-code" style="font-weight: 800; color: var(--info); font-size: 18px; letter-spacing: 2px;">4831</span>
-                </div>
+                <h5 class="fw-bold text-dark mb-2" id="alert-modal-title">Atención</h5>
+                <p class="text-muted small mb-4 px-2" id="alert-modal-message">Mensaje de alerta.</p>
+                <button type="button" class="btn btn-warning text-dark w-100 fw-bold rounded-pill py-2 shadow-sm border-0" data-bs-dismiss="modal">Entendido</button>
             </div>
-
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
-                Ingrese el código de arriba para confirmar la venta
-            </p>
-            
-            <div class="pin-container">
-                <input type="text" id="payment-pin" maxlength="4" placeholder="0000" inputmode="numeric" 
-                       style="font-size: 32px; text-align: center; width: 100%; letter-spacing: 10px; padding: 15px; border-radius: 12px; border: 2px solid var(--accent-color); background: #fff;">
-            </div>
-            
-            <div class="form-actions" style="margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button type="button" class="btn btn-secondary" id="btn-cancel-payment">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-confirm-pin">Confirmar Pago</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Ticket / Recibo -->
-    <div id="ticket-modal" class="modal">
-        <div class="modal-content" style="max-width: 380px; font-family: 'Courier New', Courier, monospace; color: #000; padding: 40px 30px;">
-            <div class="ticket-header" style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 15px; margin-bottom: 15px;">
-                <h2 style="margin: 0; font-size: 24px;">GAMELAB 🎮</h2>
-                <p style="font-size: 12px; margin: 5px 0;">RUC: 20601234567</p>
-                <p style="font-size: 12px; margin: 5px 0;">Sede Central - Lima</p>
-                <p style="font-size: 14px; font-weight: bold; margin-top: 10px;" id="ticket-id">TRX-0000</p>
-                <p style="font-size: 12px;" id="ticket-date">07/06/2026 14:30</p>
-            </div>
-            <div class="ticket-body">
-                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #000;">
-                            <th style="text-align: left; padding: 5px 0;">Cant.</th>
-                            <th style="text-align: left; padding: 5px 0;">Producto</th>
-                            <th style="text-align: right; padding: 5px 0;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ticket-items">
-                        <!-- Items dinámicos -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="ticket-footer" style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 15px;">
-                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
-                    <span>Subtotal:</span>
-                    <span id="ticket-subtotal">S/ 0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
-                    <span>IGV (18%):</span>
-                    <span id="ticket-igv">S/ 0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 10px;">
-                    <span>TOTAL:</span>
-                    <span id="ticket-total">S/ 0.00</span>
-                </div>
-                <div style="text-align: center; margin-top: 25px;">
-                    <p style="margin: 0; font-size: 13px; font-weight: bold;" id="ticket-payment-method">PAGO: EFECTIVO</p>
-                    <p style="margin: 15px 0 0 0; font-size: 11px;">¡Gracias por tu preferencia!</p>
-                    <p style="margin: 5px 0 0 0; font-size: 11px;">Vuelve pronto a GameLab</p>
-                </div>
-            </div>
-            <button class="btn btn-primary btn-block" style="margin-top: 30px; font-family: 'Inter', sans-serif;" onclick="document.getElementById('ticket-modal').style.display='none'">Cerrar Recibo</button>
         </div>
     </div>
 </div>
 
 <style>
-.pos-container {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 20px;
-    height: calc(100vh - 140px);
+/* Refuerzos visuales específicos que Bootstrap no cubre nativamente o para el estilo GameLab */
+.letter-spacing-4 { letter-spacing: 4px; }
+.border-dashed { border-style: dashed !important; }
+
+/* Scrollbar personalizado para las áreas del POS */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 10px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary);
 }
 
-.pos-catalog, .pos-cart {
-    height: 100%;
-}
-
-.catalog-card, .cart-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.category-bar {
-    display: flex;
-    gap: 10px;
-    padding: 0 25px 20px 25px;
-    flex-wrap: wrap;
-}
-
-.cat-btn {
-    padding: 10px 18px;
-    border-radius: 12px;
-    background-color: var(--primary-bg);
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 600;
-    border: none;
+/* Animación para el hover de productos */
+.product-card {
+    transition: all 0.2s ease-in-out;
     cursor: pointer;
-    transition: all 0.2s ease;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    border-color: var(--bs-primary) !important;
 }
 
-.cat-btn:hover {
-    background-color: var(--sidebar-hover);
-    color: var(--text-white);
-}
-
+/* Botón de categorías activo */
 .cat-btn.active {
-    background-color: var(--accent-color);
-    color: white;
-    box-shadow: 0px 4px 10px rgba(233, 69, 96, 0.2);
-}
-
-.catalog-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
-    padding: 10px 20px;
-    overflow-y: auto;
-}
-
-.product-item {
-    background-color: var(--primary-bg);
-    border-radius: 20px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.product-item:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-color);
-    background-color: white;
-}
-
-.product-item .prod-icon {
-    font-size: 44px;
-    margin-bottom: 12px;
-}
-
-.product-item .prod-name {
-    font-weight: 700;
-    font-size: 13px;
-    display: block;
-    margin-bottom: 4px;
-    color: var(--text-main);
-    line-height: 1.2;
-}
-
-.product-item .prod-price {
-    color: var(--accent-color);
-    font-weight: 800;
-    font-size: 15px;
-    margin-bottom: 2px;
-}
-
-.product-item .prod-stock {
-    font-size: 11px;
-    color: var(--text-muted);
-    display: block;
-    font-weight: 500;
-}
-
-.cart-items-container {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 20px;
-}
-
-.cart-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cart-table th {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    text-align: left;
-    padding: 10px 5px;
-}
-
-.cart-table td {
-    padding: 12px 5px;
-    font-size: 13px;
-    border-bottom: 1px solid #f0f2f5;
-}
-
-.cart-summary {
-    padding-top: 20px;
-    border-top: 2px dashed #eee;
-}
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.summary-row.total {
-    margin-top: 15px;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text-main);
-}
-
-.payment-method {
-    margin: 20px 0;
-}
-
-.payment-method label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-}
-
-.payment-method select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    background-color: var(--primary-bg);
-    outline: none;
-}
-
-.btn-block {
-    width: 100%;
-    padding: 16px;
-    font-size: 16px;
-    border-radius: 15px;
-}
-
-@media (max-width: 1100px) {
-    .pos-container {
-        grid-template-columns: 1fr;
-    }
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.3);
 }
 </style>

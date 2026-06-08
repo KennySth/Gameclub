@@ -14,6 +14,18 @@ const POS = {
         POS.updateCartUI();
     },
 
+    showAlert: (message, title = 'Atención') => {
+        const titleEl = document.getElementById('alert-modal-title');
+        const msgEl = document.getElementById('alert-modal-message');
+        if (titleEl) titleEl.innerText = title;
+        if (msgEl) msgEl.innerText = message;
+
+        const modalEl = document.getElementById('alert-modal');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    },
+
     renderCatalog: (filterText = '') => {
         const products = Storage.get(Storage.KEYS.PRODUCTS) || [];
         const catalogGrid = document.getElementById('pos-catalog-grid');
@@ -27,14 +39,19 @@ const POS = {
         });
 
         catalogGrid.innerHTML = filtered.map(p => `
-            <div class="product-item" onclick="POS.addToCart('${p.id}')">
-                <div class="prod-img-container" style="width: 100%; height: 80px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center;">
-                    <img src="${p.imagen || 'assets/Default.png'}" alt="${p.nombre}" 
-                         style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            <div class="col">
+                <div class="card h-100 border-light-subtle product-card shadow-sm rounded-4 p-2 text-center" onclick="POS.addToCart('${p.id}')">
+                    <div class="d-flex align-items-center justify-content-center mb-2" style="height: 100px;">
+                        <img src="${p.imagen || 'assets/Default.png'}" alt="${p.nombre}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                    </div>
+                    <div class="card-body p-1">
+                        <h6 class="card-title fw-bold text-dark small mb-1 text-truncate" title="${p.nombre}">${p.nombre}</h6>
+                        <p class="text-primary fw-bold mb-1">S/ ${p.precio.toFixed(2)}</p>
+                        <span class="badge ${p.stock <= 5 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'} border-0 small">
+                            Stock: ${p.stock}
+                        </span>
+                    </div>
                 </div>
-                <span class="prod-name">${p.nombre}</span>
-                <span class="prod-price">S/ ${p.precio.toFixed(2)}</span>
-                <span class="prod-stock">${p.stock} en stock</span>
             </div>
         `).join('');
     },
@@ -44,7 +61,7 @@ const POS = {
         const product = products.find(p => p.id === productId);
 
         if (!product || product.stock <= 0) {
-            alert("Producto sin stock disponible");
+            POS.showAlert("Producto sin stock disponible");
             return;
         }
 
@@ -53,7 +70,7 @@ const POS = {
             if (cartItem.cantidad < product.stock) {
                 cartItem.cantidad++;
             } else {
-                alert("No hay más stock disponible");
+                POS.showAlert("No hay más stock disponible");
             }
         } else {
             POS.cart.push({
@@ -94,17 +111,23 @@ const POS = {
 
         cartBody.innerHTML = POS.cart.map(item => `
             <tr>
-                <td>${item.nombre}</td>
+                <td class="ps-0">
+                    <span class="d-block fw-bold text-dark small">${item.nombre}</span>
+                    <span class="text-muted extra-small">S/ ${item.precio.toFixed(2)} c/u</span>
+                </td>
                 <td>
-                    <div style="display:flex; align-items:center; gap:5px;">
-                        <button class="btn-action" onclick="POS.updateQuantity('${item.id}', -1)">-</button>
-                        <span>${item.cantidad}</span>
-                        <button class="btn-action" onclick="POS.updateQuantity('${item.id}', 1)">+</button>
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <button class="btn btn-sm btn-light border p-0 rounded-circle" style="width:24px; height:24px;" onclick="POS.updateQuantity('${item.id}', -1)">-</button>
+                        <span class="small fw-bold">${item.cantidad}</span>
+                        <button class="btn btn-sm btn-light border p-0 rounded-circle" style="width:24px; height:24px;" onclick="POS.updateQuantity('${item.id}', 1)">+</button>
                     </div>
                 </td>
-                <td>S/ ${item.precio.toFixed(2)}</td>
-                <td>S/ ${(item.precio * item.cantidad).toFixed(2)}</td>
-                <td><button class="btn-action" onclick="POS.removeFromCart('${item.id}')">❌</button></td>
+                <td class="text-end fw-bold text-dark small">S/ ${(item.precio * item.cantidad).toFixed(2)}</td>
+                <td class="text-end pe-0">
+                    <button class="btn btn-sm btn-link text-danger p-0" onclick="POS.removeFromCart('${item.id}')">
+                        <i class="bi bi-x-circle fs-6"></i>
+                    </button>
+                </td>
             </tr>
         `).join('');
 
@@ -139,7 +162,7 @@ const POS = {
                             e.target.value = ''; // Limpiar tras "escaneo" exitoso
                             POS.renderCatalog(''); // Resetear grid
                         } else {
-                            alert("Producto no encontrado por código de barras.");
+                            POS.showAlert("Producto no encontrado por código de barras.", "Busqueda Fallida");
                         }
                     }
                 }
@@ -176,22 +199,17 @@ const POS = {
             });
         }
 
-        const btnCancelModal = document.getElementById('btn-cancel-payment');
-        if (btnCancelModal) {
-            btnCancelModal.addEventListener('click', () => {
-                document.getElementById('payment-confirm-modal').style.display = 'none';
-            });
-        }
-
         const btnConfirmPin = document.getElementById('btn-confirm-pin');
         if (btnConfirmPin) {
             btnConfirmPin.addEventListener('click', () => {
                 const pinInput = document.getElementById('payment-pin').value;
                 if (pinInput === POS.generatedPin) {
-                    document.getElementById('payment-confirm-modal').style.display = 'none';
+                    const modalEl = document.getElementById('payment-confirm-modal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
                     POS.processPayment();
                 } else {
-                    alert("Código incorrecto. Inténtelo de nuevo.");
+                    POS.showAlert("Código incorrecto. Inténtelo de nuevo.", "Error de Validación");
                     document.getElementById('payment-pin').value = '';
                     document.getElementById('payment-pin').focus();
                 }
@@ -201,7 +219,7 @@ const POS = {
 
     showConfirmModal: (method) => {
         if (POS.cart.length === 0) {
-            alert("El carrito está vacío");
+            POS.showAlert("El carrito está vacío", "Carrito Vacío");
             return;
         }
 
@@ -215,13 +233,20 @@ const POS = {
         document.getElementById('confirm-generated-code').innerText = POS.generatedPin;
         
         document.getElementById('payment-pin').value = '';
-        document.getElementById('payment-confirm-modal').style.display = 'flex';
-        document.getElementById('payment-pin').focus();
+        
+        const modalEl = document.getElementById('payment-confirm-modal');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) modal = new bootstrap.Modal(modalEl);
+        modal.show();
+        
+        modalEl.addEventListener('shown.bs.modal', () => {
+            document.getElementById('payment-pin').focus();
+        }, { once: true });
     },
 
     processPayment: () => {
         if (POS.cart.length === 0) {
-            alert("El carrito está vacío");
+            POS.showAlert("El carrito está vacío", "Carrito Vacío");
             return;
         }
 
@@ -268,9 +293,9 @@ const POS = {
         
         const itemsHtml = sale.productos.map(p => `
             <tr>
-                <td style="padding: 5px 0;">${p.cantidad}</td>
-                <td style="padding: 5px 0;">${p.nombre}</td>
-                <td style="text-align: right; padding: 5px 0;">S/ ${(p.precio * p.cantidad).toFixed(2)}</td>
+                <td class="ps-0">${p.cantidad}</td>
+                <td>${p.nombre}</td>
+                <td class="text-end pe-0">S/ ${(p.precio * p.cantidad).toFixed(2)}</td>
             </tr>
         `).join('');
         
@@ -280,7 +305,10 @@ const POS = {
         document.getElementById('ticket-total').innerText = `S/ ${sale.total.toFixed(2)}`;
         document.getElementById('ticket-payment-method').innerText = `PAGO: ${sale.metodoPago.toUpperCase()}`;
 
-        document.getElementById('ticket-modal').style.display = 'flex';
+        const modalEl = document.getElementById('ticket-modal');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) modal = new bootstrap.Modal(modalEl);
+        modal.show();
     }
 };
 

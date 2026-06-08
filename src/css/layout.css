@@ -1,182 +1,110 @@
-/* layout.css - Sidebar y Estructura Principal */
+/* layout.css - Estructura optimizada para Bootstrap 5 */
 .wrapper {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar Estilizado */
 .sidebar {
-    width: 290px;
-    background-color: var(--sidebar-bg);
-    color: var(--text-white);
+    width: 280px;
+    background-color: var(--game-sidebar-bg);
+    color: white;
     display: flex;
     flex-direction: column;
     position: fixed;
     height: 100vh;
-    transition: all 0.3s ease;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .sidebar-header {
-    padding: 40px 30px;
-    text-align: center;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.logo-icon {
-    font-size: 24px;
-}
-
-.logo-text {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    padding: 2.5rem 1.5rem;
 }
 
 .sidebar-nav {
     flex: 1;
-    padding: 0 20px;
+    padding: 0 1rem;
 }
 
 .sidebar-nav ul li {
-    padding: 15px 25px;
-    margin-bottom: 8px;
-    border-radius: 15px;
+    padding: 0.8rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.75rem;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--text-muted);
+    color: var(--game-text-muted);
 }
 
 .sidebar-nav ul li:hover {
-    background-color: var(--sidebar-hover);
-    color: var(--text-white);
+    background-color: var(--game-sidebar-hover);
+    color: white;
 }
 
 .sidebar-nav ul li.active {
-    background-color: var(--accent-color);
-    color: var(--text-white);
-    box-shadow: 0px 4px 15px rgba(233, 69, 96, 0.3);
-}
-
-.sidebar-nav ul li .icon {
-    font-size: 18px;
+    background-color: var(--game-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
 }
 
 .sidebar-footer {
-    padding: 30px;
+    padding: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .logout-link {
     background: transparent;
-    color: var(--text-muted);
+    color: var(--game-text-muted);
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 16px;
-    padding: 10px;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
 }
 
 .logout-link:hover {
-    color: var(--danger);
+    color: var(--game-danger);
+    background-color: rgba(238, 93, 80, 0.05);
 }
 
 /* Main Panel */
 .main-panel {
     flex: 1;
-    margin-left: 290px;
-    display: flex;
-    flex-direction: column;
+    margin-left: 280px;
+    background-color: var(--bs-body-bg);
 }
 
 .main-header {
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 1.5rem 2.5rem;
     background-color: transparent;
 }
 
 .header-left h2 {
-    font-size: 34px;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.search-box {
-    background-color: var(--text-white);
-    padding: 10px 20px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: var(--card-shadow);
-}
-
-.search-box input {
-    border: none;
-    outline: none;
-    font-size: 14px;
-    color: var(--text-main);
-}
-
-.notifications {
-    position: relative;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-.notifications .badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: var(--accent-color);
-    color: white;
-    font-size: 10px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--game-text-main);
+    margin: 0;
 }
 
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
-}
-
-.user-name {
-    font-weight: 600;
-    font-size: 14px;
+    gap: 0.75rem;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    box-shadow: var(--game-card-shadow);
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .content {
-    padding: 0 40px 40px 40px;
+    padding: 0 2.5rem 2.5rem 2.5rem;
 }

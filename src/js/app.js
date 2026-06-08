@@ -22,8 +22,12 @@ const App = {
         if (user) {
             // Usuario logueado
             console.log(`Session found: ${user.username} (${user.role})`);
-            if (loginContainer) loginContainer.style.display = 'none';
-            if (appWrapper) appWrapper.style.display = 'flex';
+            
+            if (loginContainer) loginContainer.classList.add('d-none');
+            if (appWrapper) {
+                appWrapper.classList.remove('d-none');
+                appWrapper.classList.add('d-flex');
+            }
             
             App.applyPermissions(user.role);
             App.updateUserInfo(user);
@@ -33,9 +37,12 @@ const App = {
             App.loadView(defaultView);
         } else {
             // No hay sesión
-            if (appWrapper) appWrapper.style.display = 'none';
+            if (appWrapper) {
+                appWrapper.classList.add('d-none');
+                appWrapper.classList.remove('d-flex');
+            }
             if (loginContainer) {
-                loginContainer.style.display = 'block';
+                loginContainer.classList.remove('d-none');
                 App.loadLogin();
             }
         }
@@ -83,20 +90,25 @@ const App = {
         
         const avatarDisplay = document.getElementById('display-user-avatar');
         if (avatarDisplay) {
-            avatarDisplay.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e94560&color=fff`;
+            avatarDisplay.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=7b2cbf&color=fff`;
         }
     },
 
     setupNavigation: () => {
-        const navItems = document.querySelectorAll('.sidebar-nav li');
+        const navItems = document.querySelectorAll('#sidebar-menu li');
         navItems.forEach(item => {
-            item.addEventListener('click', () => {
+            const link = item.querySelector('.nav-link');
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
                 if (item.style.display === 'none') return;
                 
                 const view = item.getAttribute('data-view');
                 if (view) {
-                    navItems.forEach(li => li.classList.remove('active'));
-                    item.classList.add('active');
+                    // Remover active de todos los links internos
+                    document.querySelectorAll('#sidebar-menu .nav-link').forEach(a => a.classList.remove('active'));
+                    // Añadir active al link actual
+                    if (link) link.classList.add('active');
+                    
                     App.loadView(view);
                 }
             });

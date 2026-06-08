@@ -15,20 +15,30 @@ const Login = {
     },
 
     handleLogin: () => {
-        const usernameInput = document.getElementById('username').value;
-        const passwordInput = document.getElementById('password').value;
-        const errorDiv = document.getElementById('login-error');
+        const form = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('login-error-msg');
+
+        // Reiniciar estado visual
+        form.classList.remove('was-validated');
+        errorMsg.classList.add('d-none');
+
+        // Validación nativa de campos vacíos
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
 
         // Obtener usuarios de storage
         const users = Storage.get(Storage.KEYS.USERS) || [];
         
         // Validar credenciales
-        const user = users.find(u => u.username === usernameInput && u.password === passwordInput);
+        const user = users.find(u => u.username === usernameInput.value && u.password === passwordInput.value);
 
         if (user) {
-            console.log(`Login successful for user: ${user.name} with role: ${user.role}`);
+            console.log(`Login successful for user: ${user.name}`);
             
-            // Guardar sesión (sin password)
             const sessionData = {
                 username: user.username,
                 name: user.name,
@@ -38,17 +48,27 @@ const Login = {
             
             Storage.save(Storage.KEYS.CURRENT_USER, sessionData);
             
-            // Notificar a App para que recargue y muestre el wrapper
             if (window.App) {
                 window.App.checkSession();
             }
         } else {
-            if (errorDiv) {
-                errorDiv.style.display = 'block';
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 3000);
-            }
+            // Mostrar error de credenciales incorrectas
+            errorMsg.classList.remove('d-none');
+            // Opcional: Marcar campos como inválidos manualmente para feedback visual
+            usernameInput.classList.add('is-invalid');
+            passwordInput.classList.add('is-invalid');
+            
+            // Limpiar estado de error al escribir
+            const clearError = () => {
+                errorMsg.classList.add('d-none');
+                usernameInput.classList.remove('is-invalid');
+                passwordInput.classList.remove('is-invalid');
+                usernameInput.removeEventListener('input', clearError);
+                passwordInput.removeEventListener('input', clearError);
+            };
+            
+            usernameInput.addEventListener('input', clearError);
+            passwordInput.addEventListener('input', clearError);
         }
     },
 
