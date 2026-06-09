@@ -33,13 +33,23 @@ const Reports = {
     },
 
     loadData: () => {
+        console.log("Cargando datos de reportes...");
         const allSales = Storage.get(Storage.KEYS.SALES) || [];
         const allProducts = Storage.get(Storage.KEYS.PRODUCTS) || [];
 
-        // 1. Obtener valores de filtros
-        const dateStartVal = document.getElementById('dateStart').value;
-        const dateEndVal = document.getElementById('dateEnd').value;
-        const filterCatVal = document.getElementById('filterCategory').value;
+        // 1. Obtener valores de filtros con seguridad
+        const dateStartEl = document.getElementById('dateStart');
+        const dateEndEl = document.getElementById('dateEnd');
+        const filterCatEl = document.getElementById('filterCategory');
+
+        if (!dateStartEl || !dateEndEl || !filterCatEl) {
+            console.warn("Elementos de filtro no encontrados en el DOM.");
+            return;
+        }
+
+        const dateStartVal = dateStartEl.value;
+        const dateEndVal = dateEndEl.value;
+        const filterCatVal = filterCatEl.value;
 
         const startDate = new Date(dateStartVal);
         startDate.setHours(0, 0, 0, 0);
