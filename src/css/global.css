@@ -5,17 +5,17 @@
    ============================================ */
 :root {
     /* Bootstrap Overrides */
-    --bs-primary: #7b2cbf;
-    --bs-primary-rgb: 123, 44, 191;
+    --bs-primary: #e53935;
+    --bs-primary-rgb: 229, 57, 53;
     --bs-body-bg: #f8f7fa;
     --bs-body-font-family: 'Inter', 'Segoe UI', sans-serif;
     
-    /* Gaming Theme Colors (Purple Palette) */
-    --game-sidebar-bg: #2d2438;
-    --game-sidebar-hover: #3e324c;
-    --game-accent: #7b2cbf;
-    --game-text-main: #2a2631;
-    --game-text-muted: #9d92a8;
+    /* Gaming Theme Colors (Black & Red Palette) */
+    --game-sidebar-bg: #1a1a1a;
+    --game-sidebar-hover: #2a2a2a;
+    --game-accent: #e53935;
+    --game-text-main: #1a1a1a;
+    --game-text-muted: #6c757d;
     
     /* Status Colors */
     --game-success: #05cd99;
@@ -23,9 +23,9 @@
     --game-danger: #ee5d50;
     
     /* UI Helpers */
-    --game-card-shadow: 0px 18px 40px rgba(45, 36, 56, 0.08);
+    --game-card-shadow: 0px 18px 40px rgba(26, 26, 26, 0.08);
     --game-border-radius: 1.25rem;
-    --game-dark-gradient: radial-gradient(circle at center, #2d2438 0%, #1a1520 100%);
+    --game-dark-gradient: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
 }
 
 /* ============================================
@@ -105,7 +105,7 @@ body {
 .sidebar-nav ul li.active {
     background-color: var(--game-accent);
     color: white;
-    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
 }
 
 .sidebar-footer {
@@ -190,9 +190,9 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #622399;
+    background-color: #c62828 !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.3);
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
 }
 
 /* Form Controls */
@@ -268,7 +268,7 @@ body {
 #sidebar-menu .nav-link.active {
     background-color: var(--game-accent) !important;
     color: white !important;
-    box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
+    box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
 }
 
 #sidebar-menu .nav-link i {
@@ -289,5 +289,19 @@ body {
 .logout-nav-link:hover {
     color: white !important;
     background-color: rgba(238, 93, 80, 0.15) !important;
+}
+
+/* ============================================
+   SIDEBAR & MAIN - Fixed Layout
+   ============================================ */
+.sidebar-fixed {
+    width: 245px;
+    position: fixed;
+    height: 100vh;
+    z-index: 1050;
+}
+
+.main-content {
+    margin-left: 245px;
 }
 
