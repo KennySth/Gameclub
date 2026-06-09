@@ -30,11 +30,20 @@ const Dashboard = {
         const transactionsEl = document.getElementById('stat-transactions');
         const totalStockEl = document.getElementById('stat-total-stock');
         const alertsEl = document.getElementById('stat-alerts');
+        const categoriesEl = document.getElementById('stat-categories');
 
         if (dailySalesEl) dailySalesEl.innerText = `S/ ${totalToday.toFixed(2)}`;
         if (transactionsEl) transactionsEl.innerText = todaySales.length;
         if (totalStockEl) totalStockEl.innerText = products.reduce((acc, curr) => acc + curr.stock, 0);
         if (alertsEl) alertsEl.innerText = alerts.length;
+        const totalCategories = new Set(
+            products.map(p => p.categoria)
+        ).size;
+
+        if (categoriesEl) {
+            categoriesEl.innerText =
+                `En ${totalCategories} categorías`;
+        }
     },
 
     renderRecentSales: () => {
@@ -59,24 +68,40 @@ const Dashboard = {
     renderAlerts: () => {
         const products = Storage.get(Storage.KEYS.PRODUCTS) || [];
         const alertsList = document.getElementById('dashboard-alerts-list');
+
         if (!alertsList) return;
 
-        const lowStockProducts = products.filter(p => p.stock <= p.stockMinimo).slice(0, 4);
+        const lowStockProducts = products
+            .filter(p => p.stock <= p.stockMinimo)
+            .slice(0, 4);
 
         if (lowStockProducts.length === 0) {
-            alertsList.innerHTML = '<p style="color: var(--text-muted); padding: 10px;">No hay alertas activas.</p>';
+            alertsList.innerHTML =
+                '<p style="color: var(--text-muted); padding: 10px;">No hay alertas activas.</p>';
             return;
         }
 
-        alertsList.innerHTML = lowStockProducts.map(p => `
-            <div class="alert-item">
-                <div class="icon">${p.stock === 0 ? '❌' : '⚠️'}</div>
+        alertsList.innerHTML = lowStockProducts.map(p => {
+
+            let alertClass = "low";
+
+            if (p.stock === 0) {
+                alertClass = "critical";
+            } else if (p.stock <= Math.ceil(p.stockMinimo / 2)) {
+                alertClass = "warning";
+            }
+
+            return `
+            <div class="alert-item ${alertClass}">
                 <div class="info">
                     <span class="name">${p.nombre}</span>
-                    <span class="stock">Stock actual: ${p.stock} (Mín: ${p.stockMinimo})</span>
+                    <span class="stock">
+                        Stock actual: ${p.stock} (Mín: ${p.stockMinimo})
+                    </span>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 };
 
