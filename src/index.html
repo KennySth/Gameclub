@@ -3,18 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gameclub - Sistema de Gestión</title>
+    <title>GameLab - Sistema de Gestión</title>
+    <!-- Bootstrap 5.3.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Gaming Theme -->
     <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-    <main id="app">
-        <!-- El contenido se cargará dinámicamente aquí -->
-        <h1>Cargando aplicación...</h1>
-    </main>
+    <!-- Contenedor Principal -->
+    <div id="main-container" class="min-vh-100 bg-light">
+        <!-- App Wrapper (Sidebar + Content) -->
+        <div class="d-flex min-vh-100 d-none" id="app-wrapper">
+            
+            <!-- Sidebar Nativo Bootstrap con Tema Gaming -->
+            <aside class="d-flex flex-column flex-shrink-0 p-3 text-white bg-gaming-dark shadow-lg border-end border-white border-opacity-10" style="width: 245px; position: fixed; height: 100vh; z-index: 1050;">
+                <a href="#" class="d-flex align-items-center mb-4 mb-md-0 me-md-auto text-white text-decoration-none px-2 py-4 mt-2">
+                    <span class="fs-4 fw-bold d-flex align-items-center"><i class="bi bi-controller text-primary me-2"></i> GameLab</span>
+                </a>
+                <hr class="opacity-10 mx-2 mb-4">
+                
+                <ul class="nav nav-pills flex-column mb-auto px-1" id="sidebar-menu">
+                    <li class="nav-item mb-1" data-view="dashboard" data-role="admin">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3 active" aria-current="page">
+                            <i class="bi bi-grid-1x2-fill fs-5"></i>
+                            <span class="small fw-semibold">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" data-view="pos" data-role="cajero">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3">
+                            <i class="bi bi-cart-dash-fill fs-5"></i>
+                            <span class="small fw-semibold">Ventas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" data-view="inventory" data-role="admin">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3">
+                            <i class="bi bi-box-seam-fill fs-5"></i>
+                            <span class="small fw-semibold">Inventario</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" data-view="sales-history" data-role="all">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3">
+                            <i class="bi bi-receipt-cutoff fs-5"></i>
+                            <span class="small fw-semibold">Historial</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" data-view="reports" data-role="admin">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3">
+                            <i class="bi bi-bar-chart-line-fill fs-5"></i>
+                            <span class="small fw-semibold">Reportes</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" data-view="users" data-role="admin">
+                        <a href="#" class="nav-link d-flex align-items-center gap-3 py-2.5 px-3">
+                            <i class="bi bi-people-fill fs-5"></i>
+                            <span class="small fw-semibold">Usuarios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <hr class="opacity-10 mx-2">
+                <div class="pb-3 px-1">
+                    <button id="btn-logout" class="nav-link logout-nav-link d-flex align-items-center gap-3 px-3 py-2.5 w-100 text-start border-0 bg-transparent">
+                        <i class="bi bi-box-arrow-right fs-5"></i>
+                        <span class="small fw-semibold">Cerrar Sesión</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area Area (Adjusted Margin) -->
+            <div class="d-flex flex-column flex-grow-1" style="margin-left: 245px;">
+                <!-- Header Nativo -->
+                <header class="d-flex align-items-center justify-content-between p-4 bg-transparent">
+                    <h2 class="h2 fw-bold text-dark mb-0" id="view-title">Panel de Control</h2>
+                    
+                    <div class="d-flex align-items-center gap-3 bg-white p-2 ps-4 pe-2 rounded-pill shadow-sm">
+                        <span class="small fw-semibold text-dark" id="display-user-name">Usuario</span>
+                        <img src="assets/user-avatar.png" alt="Avatar" class="rounded-circle" width="40" height="40" id="display-user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=7b2cbf&color=fff'">
+                    </div>
+                </header>
+
+                <!-- Dynamic Content Container -->
+                <main id="app" class="px-4 pb-4">
+                    <!-- El contenido dinámico se carga aquí -->
+                </main>
+            </div>
+        </div>
+
+        <!-- Contenedor para la vista de Login -->
+        <div id="login-container" class="w-100"></div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script src="js/core/storage.js"></script>
+    <script src="js/auth/login.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/inventory.js"></script>
+    <script src="js/modules/pos.js"></script>
+    <script src="js/modules/sales-history.js"></script>
+    <script src="js/modules/reports.js"></script>
+    <script src="js/modules/users.js"></script>
     <script src="js/app.js" type="module"></script>
 </body>
 </html>

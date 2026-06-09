@@ -1,0 +1,70 @@
+<div class="users-view">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Gestión de Usuarios y Roles</h3>
+            <button class="btn btn-primary" id="btn-add-user">+ Nuevo Usuario</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Usuario -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="user-modal-title">Agregar Usuario</h3>
+            <form id="user-form">
+                <input type="hidden" id="user-username-original">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="user-fullname" required placeholder="Ej. Alexander Smith">
+                </div>
+                <div class="form-group">
+                    <label>Usuario (Login)</label>
+                    <input type="text" id="user-username" required placeholder="Ej. asmith">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="user-password" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Rol de Usuario</label>
+                    <select id="user-role" required>
+                        <option value="admin_general">Administrador General</option>
+                        <option value="admin_almacen">Administrador Almacén</option>
+                        <option value="cajero">Cajero</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-close-user-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+</style>

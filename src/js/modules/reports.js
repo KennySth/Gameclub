@@ -1,206 +1,254 @@
 /**
- * Lógica del Módulo de Reportes - GameLab (Filtros Reales)
+ * reports.js - Generación de métricas y gráficos avanzados (Merge Version)
  */
-const ReportsModule = {
+
+const Reports = {
     chartInstance: null,
 
     init: () => {
-        console.log("Iniciando Módulo de Reportes GameLab...");
-        ReportsModule.seedMockData(); 
+        console.log("Iniciando Módulo de Reportes...");
         
-        // Poner por defecto las fechas de filtro (Desde hace 30 días hasta hoy)
+        // Configurar fechas por defecto (Últimos 30 días)
         const hoy = new Date();
         const haceUnMes = new Date(hoy);
         haceUnMes.setDate(hoy.getDate() - 30);
         
-        if (document.getElementById('dateStart')) {
-            document.getElementById('dateStart').value = haceUnMes.toISOString().split('T')[0];
-            document.getElementById('dateEnd').value = hoy.toISOString().split('T')[0];
+        const dateStart = document.getElementById('dateStart');
+        const dateEnd = document.getElementById('dateEnd');
+
+        if (dateStart && dateEnd) {
+            dateStart.value = haceUnMes.toISOString().split('T')[0];
+            dateEnd.value = hoy.toISOString().split('T')[0];
         }
 
-        ReportsModule.bindEvents();   
-        ReportsModule.loadData();     
-    },
-
-    seedMockData: () => {
-        const existingData = window.Storage.get('gamelab_sales');
-        
-        // Si hay menos de 5 ventas, inyectamos un montón de data nueva para probar los filtros
-        if (!existingData || existingData.length < 5) {
-            console.log("Inyectando data masiva para probar filtros...");
-            
-            // Función para restar días fácilmente
-            const restarDias = (dias) => {
-                const d = new Date();
-                d.setDate(d.getDate() - dias);
-                return d.toISOString();
-            };
-
-            const mockSales = [
-                { id: 1, date: restarDias(0), total: 259.90, items: [{ product: 'The Legend of Zelda: TOTK', category: 'hardware' }] },
-                { id: 2, date: restarDias(0), total: 15.50, items: [{ product: 'Gaseosa 500ml', category: 'snacks' }, { product: 'Galletas', category: 'snacks' }] },
-                { id: 3, date: restarDias(1), total: 280.00, items: [{ product: 'Mando PS5 DualSense', category: 'hardware' }] },
-                { id: 4, date: restarDias(2), total: 220.00, items: [{ product: 'Super Mario Bros. Wonder', category: 'hardware' }] },
-                { id: 5, date: restarDias(5), total: 8.50, items: [{ product: 'Gaseosa 500ml', category: 'snacks' }] },
-                { id: 6, date: restarDias(10), total: 2499.00, items: [{ product: 'PlayStation 5 Slim', category: 'hardware' }] },
-                { id: 7, date: restarDias(15), total: 1350.00, items: [{ product: 'Nintendo Switch OLED', category: 'hardware' }] },
-                { id: 8, date: restarDias(20), total: 35.00, items: [{ product: 'Pase 5 Horas PC', category: 'hardware' }] },
-                { id: 9, date: restarDias(35), total: 259.90, items: [{ product: 'The Legend of Zelda: TOTK', category: 'hardware' }] },
-                { id: 10, date: restarDias(40), total: 12.00, items: [{ product: 'Snack Salado', category: 'snacks' }] }
-            ];
-            window.Storage.save('gamelab_sales', mockSales);
-        }
+        Reports.bindEvents();
+        Reports.loadData();
     },
 
     bindEvents: () => {
-        document.getElementById('dateStart')?.addEventListener('change', ReportsModule.loadData);
-        document.getElementById('dateEnd')?.addEventListener('change', ReportsModule.loadData);
-        document.getElementById('filterCategory')?.addEventListener('change', ReportsModule.loadData);
-        document.getElementById('btnExportExcel')?.addEventListener('click', () => ReportsModule.exportData('CSV'));
+        document.getElementById('dateStart')?.addEventListener('change', Reports.loadData);
+        document.getElementById('dateEnd')?.addEventListener('change', Reports.loadData);
+        document.getElementById('filterCategory')?.addEventListener('change', Reports.loadData);
+        document.getElementById('btnExportCSV')?.addEventListener('click', Reports.exportData);
     },
 
     loadData: () => {
-        const allSales = window.Storage.get('gamelab_sales') || [];
-        
-        // 1. LEER LAS FECHAS DEL HTML
+        const allSales = Storage.get(Storage.KEYS.SALES) || [];
+        const allProducts = Storage.get(Storage.KEYS.PRODUCTS) || [];
+
+        // 1. Obtener valores de filtros
         const dateStartVal = document.getElementById('dateStart').value;
         const dateEndVal = document.getElementById('dateEnd').value;
         const filterCatVal = document.getElementById('filterCategory').value;
 
-        // Convertir strings a Date para comparar correctamente
         const startDate = new Date(dateStartVal);
-        startDate.setHours(0, 0, 0, 0); // Desde las 00:00 del día inicial
+        startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(dateEndVal);
-        endDate.setHours(23, 59, 59, 999); // Hasta las 23:59 del día final
+        endDate.setHours(23, 59, 59, 999);
 
-        // 2. FILTRAR LA DATA
+        // 2. Filtrar data
         const filteredSales = allSales.filter(sale => {
-            const saleDate = new Date(sale.date);
-            
-            // Ver si la fecha cuadra
+            const saleDate = new Date(sale.fecha);
             const matchDate = saleDate >= startDate && saleDate <= endDate;
 
-            // Ver si la categoría cuadra
             let matchCat = true;
             if (filterCatVal !== 'todas') {
-                matchCat = sale.items.some(item => item.category === filterCatVal);
+                // Verificar si alguno de los productos vendidos pertenece a la categoría filtrada
+                matchCat = sale.productos.some(item => {
+                    const prodData = allProducts.find(p => p.id === item.id);
+                    return prodData && prodData.categoria === filterCatVal;
+                });
             }
 
             return matchDate && matchCat;
         });
 
-        // 3. CALCULAR KPIs CON DATA FILTRADA
-        let totalRevenue = 0; 
+        // 3. Procesar Métricas
+        Reports.processKPIs(filteredSales);
+        Reports.renderTopProducts(filteredSales, allProducts);
+        Reports.renderCategoriesChart(filteredSales, allProducts);
+        Reports.renderPaymentMethods(filteredSales);
+        Reports.renderTrendChart(filteredSales);
+    },
+
+    processKPIs: (sales) => {
+        let totalRevenue = 0;
         let totalItems = 0;
 
-        filteredSales.forEach(sale => {
+        sales.forEach(sale => {
             totalRevenue += sale.total;
-            totalItems += sale.items.length;
+            sale.productos.forEach(p => totalItems += p.cantidad);
         });
-        
-        const ticketPromedio = filteredSales.length > 0 ? (totalRevenue / filteredSales.length) : 0;
+
+        const ticketPromedio = sales.length > 0 ? (totalRevenue / sales.length) : 0;
 
         if (document.getElementById('kpiRevenue')) document.getElementById('kpiRevenue').textContent = `S/ ${totalRevenue.toFixed(2)}`;
         if (document.getElementById('kpiProducts')) document.getElementById('kpiProducts').textContent = totalItems;
         if (document.getElementById('kpiTicket')) document.getElementById('kpiTicket').textContent = `S/ ${ticketPromedio.toFixed(2)}`;
-        if (document.getElementById('kpiReturns')) document.getElementById('kpiReturns').textContent = "2"; 
-
-        // 4. ACTUALIZAR TABLA Y GRÁFICO
-        ReportsModule.renderTopProducts(filteredSales);
-        ReportsModule.renderChart(filteredSales);
     },
 
-    renderTopProducts: (filteredSales) => {
+    renderTopProducts: (sales, products) => {
         const tbody = document.getElementById('topProductsList');
         if (!tbody) return;
 
-        // Contar qué productos se repiten más en las ventas filtradas
-        const productCount = {};
-        filteredSales.forEach(sale => {
-            sale.items.forEach(item => {
-                if (!productCount[item.product]) productCount[item.product] = { qty: 0, revenue: 0 };
-                productCount[item.product].qty += 1;
-                productCount[item.product].revenue += (sale.total / sale.items.length); // Ingreso aproximado
+        const productStats = {};
+        sales.forEach(sale => {
+            sale.productos.forEach(p => {
+                const prodInfo = products.find(item => item.id === p.id);
+                const name = prodInfo ? prodInfo.nombre : "Producto Desconocido";
+                
+                if (!productStats[name]) productStats[name] = { qty: 0, revenue: 0 };
+                productStats[name].qty += p.cantidad;
+                productStats[name].revenue += (p.cantidad * p.precioUnit);
             });
         });
 
-        // Ordenar del más vendido al menos vendido (Top 5)
-        const sortedProducts = Object.entries(productCount)
-            .map(([name, data]) => ({ name, qty: data.qty, revenue: data.revenue }))
+        const sorted = Object.entries(productStats)
+            .map(([name, data]) => ({ name, ...data }))
             .sort((a, b) => b.qty - a.qty)
             .slice(0, 5);
 
-        if (sortedProducts.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #9ca3af;">No hay ventas en este periodo</td></tr>`;
+        // Actualizar Producto Estrella en KPI
+        const topProductNameEl = document.getElementById('top-product-name');
+        if (topProductNameEl) {
+            topProductNameEl.textContent = sorted.length > 0 ? sorted[0].name : "-";
+        }
+
+        if (sorted.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center">No hay datos</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = sortedProducts.map((p, index) => `
+        tbody.innerHTML = sorted.map((p, i) => `
             <tr>
-                <td><span class="rank-circle">${index + 1}</span></td>
+                <td><strong>${i + 1}</strong></td>
                 <td>${p.name}</td>
                 <td>${p.qty}</td>
-                <td>${p.revenue.toFixed(2)}</td>
+                <td>S/ ${p.revenue.toFixed(2)}</td>
             </tr>
         `).join('');
     },
 
-    renderChart: (filteredSales) => {
-        const ctx = document.getElementById('ventasChart');
-        if (!ctx) return;
-        if (ReportsModule.chartInstance) ReportsModule.chartInstance.destroy();
+    renderCategoriesChart: (sales, products) => {
+        const list = document.getElementById('top-categories-list');
+        if (!list) return;
 
-        // Calcular ventas por día de la semana [Dom, Lun, Mar, Mie, Jue, Vie, Sab]
-        const salesByDay = [0, 0, 0, 0, 0, 0, 0];
-        filteredSales.forEach(sale => {
-            const date = new Date(sale.date);
-            salesByDay[date.getDay()] += sale.total;
+        const catStats = {};
+        sales.forEach(sale => {
+            sale.productos.forEach(p => {
+                const prodData = products.find(item => item.id === p.id);
+                const category = prodData ? prodData.categoria : "Otros";
+                catStats[category] = (catStats[category] || 0) + p.cantidad;
+            });
         });
 
-        // Ordenar para el gráfico: Lun(1) a Dom(0)
-        const chartData = [ salesByDay[1], salesByDay[2], salesByDay[3], salesByDay[4], salesByDay[5], salesByDay[6], salesByDay[0] ];
+        const sorted = Object.entries(catStats).sort((a, b) => b[1] - a[1]);
 
-        ReportsModule.chartInstance = new Chart(ctx, {
-            type: 'bar',
+        if (sorted.length === 0) {
+            list.innerHTML = '<p class="text-center">Sin datos</p>';
+            return;
+        }
+
+        list.innerHTML = sorted.map(([cat, qty]) => `
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2" style="background: #f8f9fa; border-radius: 8px;">
+                <span style="font-weight: 500;">${cat}</span>
+                <span class="badge bg-primary rounded-pill">${qty} vendid.</span>
+            </div>
+        `).join('');
+    },
+
+    renderPaymentMethods: (sales) => {
+        const container = document.getElementById('payment-stats');
+        if (!container) return;
+
+        const paymentStats = {};
+        sales.forEach(sale => {
+            paymentStats[sale.metodoPago] = (paymentStats[sale.metodoPago] || 0) + 1;
+        });
+
+        if (Object.keys(paymentStats).length === 0) {
+            container.innerHTML = '<p>Sin datos</p>';
+            return;
+        }
+
+        container.innerHTML = Object.entries(paymentStats).map(([method, count]) => `
+            <div class="text-center p-3" style="border: 1px solid #eee; border-radius: 12px; min-width: 120px;">
+                <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-color);">${count}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">${method}</div>
+            </div>
+        `).join('');
+    },
+
+    renderTrendChart: (sales) => {
+        const ctx = document.getElementById('ventasChart');
+        if (!ctx) return;
+        
+        if (Reports.chartInstance) Reports.chartInstance.destroy();
+
+        // Agrupar ventas por día
+        const salesByDate = {};
+        sales.forEach(sale => {
+            const d = new Date(sale.fecha).toISOString().split('T')[0];
+            salesByDate[d] = (salesByDate[d] || 0) + sale.total;
+        });
+
+        // Obtener los últimos 7 días con datos o ceros
+        const labels = [];
+        const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            labels.push(d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }));
+            data.push(salesByDate[dateStr] || 0);
+        }
+
+        Reports.chartInstance = new Chart(ctx, {
+            type: 'line',
             data: {
-                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                labels: labels,
                 datasets: [{
-                    label: 'Ventas (S/)',
-                    data: chartData,
-                    backgroundColor: (context) => context.dataIndex === 5 ? '#10b981' : '#8b5cf6',
-                    borderRadius: 4, barThickness: 30
+                    label: 'Ventas Diarias (S/)',
+                    data: data,
+                    borderColor: '#4318ff',
+                    backgroundColor: 'rgba(67, 24, 255, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#4318ff'
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { grid: { color: '#2d3748', drawBorder: false }, ticks: { color: '#9ca3af', callback: v => 'S/ ' + v } },
-                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { callback: v => 'S/ ' + v } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     },
 
-    exportData: (format) => {
-        if (format === 'CSV') {
-            const allSales = window.Storage.get('gamelab_sales') || [];
-            if (allSales.length === 0) { alert("No hay datos para exportar."); return; }
+    exportData: () => {
+        const sales = Storage.get(Storage.KEYS.SALES) || [];
+        if (sales.length === 0) { alert("No hay datos para exportar."); return; }
 
-            let csvContent = "ID,Fecha,Total (S/),Productos\n";
-            allSales.forEach(sale => {
-                const fecha = new Date(sale.date).toLocaleDateString(); 
-                const productos = sale.items.map(item => item.product).join(" - ");
-                csvContent += `${sale.id},${fecha},${sale.total.toFixed(2)},${productos}\n`;
-            });
+        let csvContent = "ID,Fecha,Metodo Pago,Total (S/)\n";
+        sales.forEach(sale => {
+            const fecha = new Date(sale.fecha).toLocaleDateString(); 
+            csvContent += `${sale.id},${fecha},${sale.metodoPago},${sale.total.toFixed(2)}\n`;
+        });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "reporte_ventas_gamelab.csv"; 
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `reporte_gamelab_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 };
 
-window.ReportsModule = ReportsModule;
+window.Reports = Reports;

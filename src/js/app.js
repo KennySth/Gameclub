@@ -1,16 +1,144 @@
 /**
- * app.js - Orquestador: navegación y carga de módulos
+ * app.js - Orquestador: navegación y control de acceso (RBAC)
  */
 
 const App = {
     init: () => {
         console.log("Gameclub App Initialized");
-        // Por defecto cargar dashboard o login
-        App.loadView('dashboard');
+        // Inicializar datos de storage
+        if (window.Storage) {
+            window.Storage.init();
+        }
+
+        App.checkSession();
+        App.setupNavigation();
+    },
+
+    checkSession: () => {
+        const user = Storage.get(Storage.KEYS.CURRENT_USER);
+        const appWrapper = document.getElementById('app-wrapper');
+        const loginContainer = document.getElementById('login-container');
+
+        if (user) {
+            // Usuario logueado
+            console.log(`Session found: ${user.username} (${user.role})`);
+            
+            if (loginContainer) loginContainer.classList.add('d-none');
+            if (appWrapper) {
+                appWrapper.classList.remove('d-none');
+                appWrapper.classList.add('d-flex');
+            }
+            
+            App.applyPermissions(user.role);
+            App.updateUserInfo(user);
+            
+            // Cargar vista inicial según rol
+            const defaultView = (user.role === 'cajero') ? 'pos' : 'dashboard';
+            App.loadView(defaultView);
+        } else {
+            // No hay sesión
+            if (appWrapper) {
+                appWrapper.classList.add('d-none');
+                appWrapper.classList.remove('d-flex');
+            }
+            if (loginContainer) {
+                loginContainer.classList.remove('d-none');
+                App.loadLogin();
+            }
+        }
+    },
+
+    loadLogin: async () => {
+        const loginContainer = document.getElementById('login-container');
+        try {
+            const response = await fetch('views/login.html');
+            if (response.ok) {
+                loginContainer.innerHTML = await response.text();
+                if (window.Login) window.Login.init();
+            }
+        } catch (error) {
+            console.error("Error loading login view:", error);
+        }
+    },
+
+    applyPermissions: (role) => {
+        const menuItems = document.querySelectorAll('#sidebar-menu li');
+        menuItems.forEach(item => {
+            const view = item.getAttribute('data-view');
+            
+            if (role === 'cajero') {
+                // Cajero solo ve 'pos' y 'sales-history'
+                if (view === 'pos' || view === 'sales-history') {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            } else if (role === 'admin_general' || role === 'admin_almacen') {
+                // Admin ve todo excepto 'pos'
+                if (view === 'pos') {
+                    item.style.display = 'none';
+                } else {
+                    item.style.display = 'flex';
+                }
+            }
+        });
+    },
+
+    updateUserInfo: (user) => {
+        const nameDisplay = document.getElementById('display-user-name');
+        if (nameDisplay) nameDisplay.innerText = user.name;
+        
+        const avatarDisplay = document.getElementById('display-user-avatar');
+        if (avatarDisplay) {
+            avatarDisplay.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=7b2cbf&color=fff`;
+        }
+    },
+
+    setupNavigation: () => {
+        const navItems = document.querySelectorAll('#sidebar-menu li');
+        navItems.forEach(item => {
+            const link = item.querySelector('.nav-link');
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (item.style.display === 'none') return;
+                
+                const view = item.getAttribute('data-view');
+                if (view) {
+                    // Remover active de todos los links internos
+                    document.querySelectorAll('#sidebar-menu .nav-link').forEach(a => a.classList.remove('active'));
+                    // Añadir active al link actual
+                    if (link) link.classList.add('active');
+                    
+                    App.loadView(view);
+                }
+            });
+        });
+
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) {
+            btnLogout.onclick = () => {
+                if (confirm("¿Cerrar sesión?")) {
+                    if (window.Login) window.Login.logout();
+                }
+            };
+        }
     },
 
     loadView: async (viewName) => {
         const appContainer = document.getElementById('app');
+        const viewTitle = document.getElementById('view-title');
+        
+        const titles = {
+            'dashboard': 'Panel de Control',
+            'pos': 'Punto de Venta',
+            'inventory': 'Inventario de Productos',
+            'sales-history': 'Historial de Ventas',
+            'reports': 'Reportes y Estadísticas',
+            'users': 'Gestión de Usuarios'
+        };
+
+        if (viewTitle) viewTitle.innerText = titles[viewName] || 'Sistema GameLab';
+
         try {
             const response = await fetch(`views/${viewName}.html`);
             if (response.ok) {
@@ -18,20 +146,41 @@ const App = {
                 appContainer.innerHTML = html;
                 App.initModule(viewName);
             } else {
-                appContainer.innerHTML = `<h1>Error 404: Vista no encontrada</h1>`;
+                appContainer.innerHTML = `<div class="card"><h1>Error 404: Vista no encontrada (${viewName})</h1></div>`;
             }
         } catch (error) {
             console.error("Error loading view:", error);
-            appContainer.innerHTML = `<h1>Error al cargar la vista</h1>`;
+            appContainer.innerHTML = `<div class="card"><h1>Error al cargar la vista</h1></div>`;
         }
     },
 
     initModule: (viewName) => {
         console.log(`Initializing module: ${viewName}`);
-        // Aquí se podría cargar dinámicamente el JS del módulo
+        const user = Storage.get(Storage.KEYS.CURRENT_USER);
+        
+        switch(viewName) {
+            case 'inventory':
+                if (window.Inventory) window.Inventory.init();
+                break;
+            case 'dashboard':
+                if (window.Dashboard) window.Dashboard.init(user.role);
+                break;
+            case 'pos':
+                if (window.POS) window.POS.init();
+                break;
+            case 'sales-history':
+                if (window.SalesHistory) window.SalesHistory.init();
+                break;
+            case 'users':
+                if (window.Users) window.Users.init();
+                break;
+            case 'reports':
+                if (window.Reports) window.Reports.init();
+                break;
+        }
     }
 };
 
 document.addEventListener('DOMContentLoaded', App.init);
-
+window.App = App;
 export default App;

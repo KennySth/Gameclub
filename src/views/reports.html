@@ -1,87 +1,103 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameLab - Reportes</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/reports.css"> 
-</head>
-<body>
-
-    <div class="container">
-        <aside class="sidebar">
-            <h2 style="padding: 20px; margin: 0; border-bottom: 1px solid var(--border-color);">🎮 GameLab POS</h2>
-            <ul style="list-style: none; padding: 20px; line-height: 2.5;">
-                <li><a href="#" style="color: #9ca3af; text-decoration: none;">🏠 Dashboard</a></li>
-                <li><a href="#" style="color: #9ca3af; text-decoration: none;">🛒 Punto de Venta</a></li>
-                <li><a href="#" style="color: #9ca3af; text-decoration: none;">📦 Inventario</a></li>
-                <li><a href="#" style="color: white; background-color: #8b5cf6; padding: 8px 15px; border-radius: 8px; font-weight: bold; text-decoration: none; display: block;">📊 Reportes</a></li>
-            </ul>
-        </aside>
-
-        <main class="content">
-            <div class="reports-container">
-                <header class="module-header">
-                    <h2>Reportes y Estadísticas</h2>
-                </header>
-
-                <div class="filters-bar">
-                    <div class="filters-group">
-                        <span>Periodo:</span>
-                        <input type="date" id="dateStart" class="input-dark" value="2026-01-05">
-                        <span>al</span>
-                        <input type="date" id="dateEnd" class="input-dark" value="2026-09-05">
-                        <span style="margin-left: 20px;">Mostrar:</span>
-                        <select id="filterCategory" class="input-dark">
-                            <option value="todas">Ventas Generales</option>
-                            <option value="hardware">Hardware / Consolas</option>
-                            <option value="snacks">Snacks y Bebidas</option>
-                        </select>
-                    </div>
-                    <button class="btn-export" id="btnExportExcel">📄 Exportar a CSV    </button>
-                </div>
-
-                <section class="kpis-grid">
-                    <div class="kpi-card"><span class="kpi-label">Ingresos Totales</span><strong class="kpi-value" id="kpiRevenue">S/ 0.00</strong></div>
-                    <div class="kpi-card"><span class="kpi-label">Productos Vendidos</span><strong class="kpi-value" id="kpiProducts">0</strong></div>
-                    <div class="kpi-card"><span class="kpi-label">Ticket Promedio</span><strong class="kpi-value" id="kpiTicket">S/ 0.00</strong></div>
-                    <div class="kpi-card"><span class="kpi-label">Devoluciones</span><strong class="kpi-value" id="kpiReturns">0</strong></div>
-                </section>
-
-                <section class="data-grid">
-                    <div class="card chart-container">
-                        <h3>Tendencia de Ventas (Últimos 7 días)</h3>
-                        <div class="chart-wrapper"><canvas id="ventasChart"></canvas></div>
-                    </div>
-                    <div class="top-table">
-                        <h3>Top 5 Más Vendidos</h3>
-                        <table class="table-dark">
-                            <thead><tr><th>#</th><th>Producto</th><th>Cant.</th><th>Total (S/)</th></tr></thead>
-                            <tbody id="topProductsList"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </main>
+<div class="reports-view">
+    <div class="filters-bar" style="display: flex; gap: 15px; align-items: center; margin-bottom: 25px; background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow-sm);">
+        <div class="filters-group" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 600; color: var(--text-dark);">Periodo:</span>
+            <input type="date" id="dateStart" class="form-control" style="width: auto;">
+            <span style="color: var(--text-muted);">al</span>
+            <input type="date" id="dateEnd" class="form-control" style="width: auto;">
+            
+            <span style="font-weight: 600; color: var(--text-dark); margin-left: 15px;">Categoría:</span>
+            <select id="filterCategory" class="form-select" style="width: auto;">
+                <option value="todas">Todas las categorías</option>
+                <option value="Consolas">Consolas</option>
+                <option value="Videojuegos">Videojuegos</option>
+                <option value="Accesorios">Accesorios</option>
+                <option value="Otros">Otros</option>
+            </select>
+        </div>
+        <button class="btn btn-secondary" id="btnExportCSV" style="margin-left: auto;">
+            <i class="fas fa-file-csv"></i> Exportar CSV
+        </button>
     </div>
 
-    <script src="../js/core/storage.js"></script>
-    <script src="../js/modules/reports.js"></script>
+    <section class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--accent-color); background: rgba(67, 24, 255, 0.1);">💰</div>
+            <div class="stat-info">
+                <span class="label">Ingresos Totales</span>
+                <span class="value" id="kpiRevenue">S/ 0.00</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--info); background: rgba(0, 184, 217, 0.1);">📦</div>
+            <div class="stat-info">
+                <span class="label">Productos Vendidos</span>
+                <span class="value" id="kpiProducts">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #ffab00; background: rgba(255, 171, 0, 0.1);">🎫</div>
+            <div class="stat-info">
+                <span class="label">Ticket Promedio</span>
+                <span class="value" id="kpiTicket">S/ 0.00</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--info); background: rgba(0, 184, 217, 0.1);">💎</div>
+            <div class="stat-info">
+                <span class="label">Producto Estrella</span>
+                <span class="value" id="top-product-name">-</span>
+            </div>
+        </div>
+    </section>
 
-    <script>
-        window.onload = () => {
-            if (window.ReportsModule) {
-                window.ReportsModule.init();
-            } else {
-                console.error("Error: Storage o ReportsModule no están definidos.");
-            }
-        };
-    </script>
-</body>
-</html>
+    <div class="card" style="margin-bottom: 25px;">
+        <div class="card-header">
+            <h3 class="card-title">Tendencia de Ventas (Periodo Seleccionado)</h3>
+        </div>
+        <div class="chart-container" style="height: 300px; padding: 20px;">
+            <canvas id="ventasChart"></canvas>
+        </div>
+    </div>
+
+    <div class="reports-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Top 5 Más Vendidos</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Total (S/)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topProductsList">
+                        <!-- Dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Distribución por Categorías</h3>
+            </div>
+            <div id="top-categories-list" style="padding: 10px;">
+                <!-- Dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+            <h3 class="card-title">Métodos de Pago más usados</h3>
+        </div>
+        <div id="payment-stats" style="display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; justify-content: center;">
+            <!-- Dinámico -->
+        </div>
+    </div>
+</div>
