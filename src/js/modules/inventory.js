@@ -24,23 +24,33 @@ const Inventory = {
 
         tableBody.innerHTML = filteredProducts.map(p => `
             <tr>
-                <td>
+                <td class="ps-4">
                     <img src="${p.imagen || 'assets/Default.png'}" alt="${p.nombre}" 
-                         style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid #eee;">
+                         class="rounded-3 shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
                 </td>
-                <td><strong>${p.id}</strong></td>
-                <td>${p.nombre}</td>
-                <td>${p.categoria}</td>
-                <td>S/ ${p.precio.toFixed(2)}</td>
-                <td>${p.stock}</td>
+                <td><span class="text-primary fw-bold small">${p.id}</span></td>
                 <td>
-                    <span class="badge-status ${p.estado.toLowerCase().replace(' ', '-')}">
+                    <div class="fw-semibold text-dark">${p.nombre}</div>
+                </td>
+                <td><span class="badge bg-light text-muted border fw-normal">${p.categoria}</span></td>
+                <td><span class="fw-bold text-dark">S/ ${p.precio.toFixed(2)}</span></td>
+                <td>
+                    <span class="text-dark fw-medium">${p.stock}</span>
+                </td>
+                <td>
+                    <span class="badge-pill-status status-${p.estado.toLowerCase().replace(' ', '-')}">
                         ${p.estado}
                     </span>
                 </td>
-                <td>
-                    <button class="btn-action edit" onclick="Inventory.openEditModal('${p.id}')">✏️</button>
-                    <button class="btn-action delete" onclick="Inventory.deleteProduct('${p.id}')">🗑️</button>
+                <td class="text-end pe-4">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm rounded-start-2" onclick="Inventory.openEditModal('${p.id}')" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm rounded-end-2" onclick="Inventory.deleteProduct('${p.id}')" title="Eliminar">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `).join('');
