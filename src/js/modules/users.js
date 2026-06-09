@@ -14,22 +14,44 @@ const Users = {
         const tableBody = document.getElementById('users-table-body');
         if (!tableBody) return;
 
-        tableBody.innerHTML = users.map(u => `
-            <tr>
-                <td><strong>${u.name}</strong></td>
-                <td>${u.username}</td>
-                <td>
-                    <span class="badge-status pending" style="background-color: #f0f2f5; color: var(--text-main);">
-                        ${u.role.replace('_', ' ').toUpperCase()}
-                    </span>
-                </td>
-                <td><span class="badge-status completed">Activo</span></td>
-                <td>
-                    <button class="btn-action edit" onclick="Users.openEditModal('${u.username}')">✏️</button>
-                    <button class="btn-action delete" onclick="Users.deleteUser('${u.username}')">🗑️</button>
-                </td>
-            </tr>
-        `).join('');
+        tableBody.innerHTML = users.map(u => {
+            const roleClass = `role-${u.role.replace('_', '-')}`;
+            const roleName = u.role.replace('_', ' ').toUpperCase();
+            
+            return `
+                <tr>
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-3 bg-light text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 50%; border: 1px solid #eee; font-size: 12px;">
+                                ${u.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                            </div>
+                            <div class="fw-bold text-dark">${u.name}</div>
+                        </div>
+                    </td>
+                    <td><span class="text-muted small">${u.username}</span></td>
+                    <td>
+                        <span class="role-badge ${roleClass}">
+                            ${roleName}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="small fw-medium status-active">
+                            <i class="bi bi-check-circle-fill me-1"></i> Activo
+                        </span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group shadow-sm rounded-2">
+                            <button class="btn btn-white btn-sm border" onclick="Users.openEditModal('${u.username}')" title="Editar">
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </button>
+                            <button class="btn btn-white btn-sm border" onclick="Users.deleteUser('${u.username}')" title="Eliminar">
+                                <i class="bi bi-trash3-fill text-danger"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     },
 
     setupEventListeners: () => {
