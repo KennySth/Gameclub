@@ -142,6 +142,51 @@ const POS = {
         document.getElementById('cart-total').innerText = `S/ ${subtotal.toFixed(2)}`;
     },
 
+    startVisualScanner: () => {
+        const modal = document.getElementById('scanner-visual-modal');
+        const progress = document.getElementById('scanner-progress');
+        const status = document.getElementById('scanner-status');
+
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+        progress.style.width = '0%';
+        status.innerText = "BUSCANDO CÓDIGO DE BARRAS...";
+        status.style.color = "#0f0";
+
+        setTimeout(() => {
+            progress.style.width = '100%';
+        }, 100);
+
+        setTimeout(() => {
+            POS.playBeep();
+            status.innerText = "¡CÓDIGO DETECTADO!";
+            status.style.color = "var(--game-accent)";
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                POS.addToCart('PROD-001');
+            }, 800);
+        }, 2000);
+    },
+
+    playBeep: () => {
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, context.currentTime);
+            oscillator.connect(gain);
+            gain.connect(context.destination);
+            oscillator.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.1);
+            oscillator.stop(context.currentTime + 0.1);
+        } catch (e) {
+            console.log("Beep!");
+        }
+    },
+
     setupEventListeners: () => {
         const searchInput = document.getElementById('pos-search');
         if (searchInput) {
@@ -213,6 +258,20 @@ const POS = {
                     document.getElementById('payment-pin').value = '';
                     document.getElementById('payment-pin').focus();
                 }
+            });
+        }
+
+        const btnScan = document.getElementById('btn-scan-barcode-pos');
+        if (btnScan) {
+            btnScan.addEventListener('click', () => {
+                POS.startVisualScanner();
+            });
+        }
+
+        const btnCloseScanner = document.getElementById('btn-close-scanner-pos');
+        if (btnCloseScanner) {
+            btnCloseScanner.addEventListener('click', () => {
+                document.getElementById('scanner-visual-modal').style.display = 'none';
             });
         }
     },
@@ -313,4 +372,3 @@ const POS = {
 };
 
 window.POS = POS;
-S;
