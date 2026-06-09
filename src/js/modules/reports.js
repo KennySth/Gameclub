@@ -105,11 +105,14 @@ const Reports = {
         sales.forEach(sale => {
             sale.productos.forEach(p => {
                 const prodInfo = products.find(item => item.id === p.id);
-                const name = prodInfo ? prodInfo.nombre : "Producto Desconocido";
+                const name = prodInfo ? prodInfo.nombre : (p.nombre || "Producto Desconocido");
+                
+                // Resolver el precio unitario buscando en múltiples lugares para evitar NaN
+                const unitPrice = p.precioUnit || p.precio || (prodInfo ? prodInfo.precio : 0);
                 
                 if (!productStats[name]) productStats[name] = { qty: 0, revenue: 0 };
                 productStats[name].qty += p.cantidad;
-                productStats[name].revenue += (p.cantidad * p.precioUnit);
+                productStats[name].revenue += (p.cantidad * unitPrice);
             });
         });
 

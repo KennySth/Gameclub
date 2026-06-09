@@ -295,7 +295,7 @@ const POS = {
             <tr>
                 <td class="ps-0">${p.cantidad}</td>
                 <td>${p.nombre}</td>
-                <td class="text-end pe-0">S/ ${(p.precio * p.cantidad).toFixed(2)}</td>
+                <td class="text-end pe-0">S/ ${(p.precioUnit * p.cantidad).toFixed(2)}</td>
             </tr>
         `).join('');
         
@@ -313,3 +313,4 @@ const POS = {
 };
 
 window.POS = POS;
+S;
