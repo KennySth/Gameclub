@@ -1,15 +1,250 @@
-<!-- Fragmento: Ventas POS (Katherine Patricia) -->
-<div id="pos-container">
-    <h2>Punto de Venta (POS)</h2>
-    <div class="pos-grid">
-        <div class="product-search">
-            <!-- Buscador de productos -->
+<!-- Fragmento: Punto de Venta (Katherine Patricia) - Refactorizado con Bootstrap 5 -->
+<div class="container-fluid p-0">
+    <div class="row g-3">
+        <!-- Izquierda: Catálogo y Búsqueda -->
+        <div class="col-lg-8 d-flex flex-column" style="max-height: calc(100vh - 120px);">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="input-group mb-3 shadow-sm rounded-3">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="pos-search" class="form-control border-start-0 ps-0" placeholder="Buscar producto por nombre o código...">
+                    </div>
+
+                    <!-- Filtro de Categorías -->
+                    <div class="d-flex gap-2 mb-2 overflow-x-auto pb-2" id="pos-category-bar">
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn active" data-category="all">Todos</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Consolas">Consolas</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Videojuegos">Videojuegos</button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold cat-btn" data-category="Accesorios">Accesorios</button>
+                    </div>
+                </div>
+
+                <div class="card-body overflow-y-auto pt-0 px-4">
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3" id="pos-catalog-grid">
+                        <!-- Productos cargados dinámicamente -->
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="cart-section">
-            <!-- Carrito, cálculo de IGV y total -->
-        </div>
-        <div class="payment-methods">
-            <!-- Métodos de pago -->
+
+        <!-- Derecha: Carrito de Compras -->
+        <div class="col-lg-4 d-flex flex-column" style="max-height: calc(100vh - 120px);">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-bold mb-0 text-dark">Carrito de Compras</h5>
+                    <button class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" id="btn-clear-cart" title="Limpiar Carrito">
+                        <i class="bi bi-trash3 fs-5"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body d-flex flex-column px-4">
+                    <div class="flex-grow-1 overflow-y-auto mb-3" style="min-height: 200px;">
+                        <table class="table table-hover align-middle">
+                            <thead class="sticky-top bg-white">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>Producto</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-body">
+                                <!-- Items del carrito -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Resumen del Carrito -->
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2 small text-secondary">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal">S/ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 small text-secondary">
+                            <span>IGV (18%)</span>
+                            <span id="cart-igv">S/ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="h4 fw-bold text-dark">Total</span>
+                            <span class="h4 fw-bold text-primary" id="cart-total">S/ 0.00</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Método de Pago</label>
+                            <select class="form-select border-light-subtle shadow-sm" id="payment-method">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Yape/POS">Yape / POS</option>
+                                <option value="QR">Código QR</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2 mb-2" id="btn-checkout">
+                            Procesar Pago <i class="bi bi-credit-card-2-back fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Modal: Confirmar Pago Electrónico -->
+<div class="modal fade" id="payment-confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title w-100 text-center fw-bold">Confirmar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-light p-3 rounded-4 mb-4 text-start border border-dashed border-secondary-subtle">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Método:</span>
+                        <span id="confirm-method" class="fw-bold text-primary small">Yape</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 border-bottom border-dashed pb-2">
+                        <span class="text-muted small">Monto:</span>
+                        <span id="confirm-amount" class="fw-bold text-dark h5 mb-0">S/ 0.00</span>
+                    </div>
+                    <div class="text-center py-2">
+                        <span class="text-muted small d-block mb-1">Código de Operación:</span>
+                        <span id="confirm-generated-code" class="h2 fw-bolder text-info letter-spacing-4">4831</span>
+                    </div>
+                </div>
+
+                <p class="small text-muted mb-3">Ingrese el código mostrado arriba para confirmar</p>
+                
+                <div class="mb-4">
+                    <input type="text" id="payment-pin" class="form-control form-control-lg text-center fw-bold fs-2 rounded-4 border-2" maxlength="4" placeholder="0000" inputmode="numeric" style="letter-spacing: 12px;">
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-light w-100 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary w-100 py-2 fw-semibold" id="btn-confirm-pin">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Ticket / Recibo -->
+<div class="modal fade" id="ticket-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 p-sm-5 text-dark" style="font-family: 'Courier New', Courier, monospace;">
+                <div class="text-center mb-4 border-bottom border-dashed pb-3">
+                    <h3 class="fw-bold mb-0">GAMELAB 🎮</h3>
+                    <p class="small mb-1">RUC: 20601234567</p>
+                    <p class="small mb-2">Sede Central - Lima</p>
+                    <div class="bg-light py-2 rounded-3 mt-2">
+                        <span class="fw-bold small d-block" id="ticket-id">TRX-0000</span>
+                        <span class="small" id="ticket-date">07/06/2026 14:30</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <table class="table table-sm table-borderless small w-100 mb-0">
+                        <thead>
+                            <tr class="border-bottom border-dark border-opacity-25">
+                                <th class="ps-0">Cant.</th>
+                                <th>Producto</th>
+                                <th class="text-end pe-0">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticket-items">
+                            <!-- Items dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="border-top border-dashed pt-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Subtotal:</span>
+                        <span id="ticket-subtotal">S/ 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>IGV (18%):</span>
+                        <span id="ticket-igv">S/ 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between h5 fw-bold mt-2">
+                        <span>TOTAL:</span>
+                        <span id="ticket-total">S/ 0.00</span>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="fw-bold small mb-3" id="ticket-payment-method">PAGO: EFECTIVO</p>
+                        <p class="small mb-0 opacity-75">¡Gracias por tu preferencia!</p>
+                        <p class="small mb-0 opacity-75">Vuelve pronto a GameLab</p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-4 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2" data-bs-dismiss="modal">
+                    Cerrar Recibo <i class="bi bi-check-circle fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Alerta Genérica -->
+<div class="modal fade" id="alert-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-body p-4 text-center">
+                <div class="text-warning mb-3">
+                    <i class="bi bi-exclamation-triangle-fill display-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2" id="alert-modal-title">Atención</h5>
+                <p class="text-muted small mb-4 px-2" id="alert-modal-message">Mensaje de alerta.</p>
+                <button type="button" class="btn btn-warning text-dark w-100 fw-bold rounded-pill py-2 shadow-sm border-0" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Refuerzos visuales específicos que Bootstrap no cubre nativamente o para el estilo GameLab */
+.letter-spacing-4 { letter-spacing: 4px; }
+.border-dashed { border-style: dashed !important; }
+
+/* Scrollbar personalizado para las áreas del POS */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 10px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary);
+}
+
+/* Animación para el hover de productos */
+.product-card {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+/* Botón de categorías activo */
+.cat-btn.active {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.3);
+}
+</style>
